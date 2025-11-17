@@ -1,4 +1,4 @@
-import moment from 'moment';
+import {getDay, getDaysInMonth, addDays, getMonth, type Day} from 'date-fns';
 
 /**
  * Creates a 2D array of Date objects representing a calendar month grid.
@@ -7,33 +7,22 @@ import moment from 'moment';
 export const createMonthGrid = (
     year: number,
     month: number,
-    firstDayOfWeek: number,
+    firstDayOfWeek: Day,
     showOutsideDays = true
 ): (Date | null)[][] => {
-    const firstDay = moment([year, month, 1]);
-    const offset = (firstDay.day() - firstDayOfWeek + 7) % 7;
-    const daysInMonth = firstDay.daysInMonth();
-    const weeksNeeded = Math.ceil((offset + daysInMonth) / 7);
-    const startDate = firstDay.clone().subtract(offset, 'days');
+    const firstDay = new Date(year, month, 1);
+    const offset = (getDay(firstDay) - firstDayOfWeek + 7) % 7;
+    const startDate = addDays(firstDay, -offset);
+    const weeksNeeded = Math.ceil((offset + getDaysInMonth(firstDay)) / 7);
 
-    const grid: (Date | null)[][] = [];
+    return Array.from({length: 6}, (_, week) =>
+        Array.from({length: 7}, (_, day) => {
+            if (week >= weeksNeeded) {
+                return null;
+            }
 
-    for (let week = 0; week < weeksNeeded; week++) {
-        grid.push(
-            Array.from({length: 7}, (_, day) => {
-                const date = startDate.clone().add(week * 7 + day, 'days');
-                if (!showOutsideDays && date.month() !== month) {
-                    return null;
-                }
-                return date.toDate();
-            })
-        );
-    }
-
-    // Pad with empty rows to always have 6 rows total
-    while (grid.length < 6) {
-        grid.push(Array.from({length: 7}, () => null));
-    }
-
-    return grid;
+            const date = addDays(startDate, week * 7 + day);
+            return showOutsideDays || getMonth(date) === month ? date : null;
+        })
+    );
 };

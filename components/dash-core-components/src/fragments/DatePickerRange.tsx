@@ -7,6 +7,7 @@ import {
     ArrowLeftIcon,
     ArrowRightIcon,
 } from '@radix-ui/react-icons';
+import {addDays, subDays} from 'date-fns';
 import AutosizeInput from 'react-input-autosize';
 import Calendar, {CalendarHandle} from '../utils/calendar/Calendar';
 import {DatePickerRangeProps, CalendarDirection} from '../types';
@@ -19,7 +20,6 @@ import {
 } from '../utils/calendar/helpers';
 import '../components/css/datepickers.css';
 import uuid from 'uniqid';
-import moment from 'moment';
 
 const DatePickerRange = ({
     id,
@@ -81,12 +81,8 @@ const DatePickerRange = ({
         ) {
             const minimumNightsDates: Date[] = [];
             for (let i = 1; i < minimum_nights; i++) {
-                minimumNightsDates.push(
-                    moment(internalStartDate).add(i, 'day').toDate()
-                );
-                minimumNightsDates.push(
-                    moment(internalStartDate).subtract(i, 'day').toDate()
-                );
+                minimumNightsDates.push(addDays(internalStartDate, i));
+                minimumNightsDates.push(subDays(internalStartDate, i));
             }
             return [...baseDates, ...minimumNightsDates];
         }

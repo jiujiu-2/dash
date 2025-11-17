@@ -1,5 +1,17 @@
 import React, {useCallback, useMemo} from 'react';
-import moment from 'moment';
+import {
+    addDays,
+    subDays,
+    addWeeks,
+    subWeeks,
+    addMonths,
+    subMonths,
+    setDay,
+    startOfWeek,
+    endOfWeek,
+    format,
+} from 'date-fns';
+import type {Day} from 'date-fns';
 import CalendarDay from './CalendarDay';
 import CalendarDayPadding from './CalendarDayPadding';
 import {createMonthGrid} from './createMonthGrid';
@@ -26,7 +38,7 @@ type CalendarMonthProps = {
     onSelectionEnd?: (date: Date) => void;
     onDayFocused?: (date: Date) => void;
     onDaysHighlighted?: (date: Date) => void;
-    firstDayOfWeek?: number; // 0-7
+    firstDayOfWeek?: Day;
     showOutsideDays?: boolean;
     daySize?: number;
     monthFormat?: string;
@@ -80,17 +92,15 @@ export const CalendarMonth = ({
     );
 
     const daysOfTheWeek = useMemo(() => {
-        return Array.from({length: 7}, (_, i) =>
-            moment()
-                .day((i + firstDayOfWeek) % 7)
-                .format('dd')
-        );
+        return Array.from({length: 7}, (_, i) => {
+            const date = setDay(new Date(), (i + firstDayOfWeek) % 7);
+            return format(date, 'EEEEEE');
+        });
     }, [firstDayOfWeek]);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent, date: Date) => {
-            const m = moment(date);
-            let newDate: moment.Moment | null = null;
+            let newDate: Date | null = null;
 
             switch (e.key) {
                 case ' ':
@@ -107,42 +117,32 @@ export const CalendarMonth = ({
                 case 'ArrowRight':
                     newDate =
                         direction === CalendarDirection.RightToLeft
-                            ? m.subtract(1, 'day')
-                            : m.add(1, 'day');
+                            ? subDays(date, 1)
+                            : addDays(date, 1);
                     break;
                 case 'ArrowLeft':
                     newDate =
                         direction === CalendarDirection.RightToLeft
-                            ? m.add(1, 'day')
-                            : m.subtract(1, 'day');
+                            ? addDays(date, 1)
+                            : subDays(date, 1);
                     break;
                 case 'ArrowDown':
-                    newDate = m.add(1, 'week');
+                    newDate = addWeeks(date, 1);
                     break;
                 case 'ArrowUp':
-                    newDate = m.subtract(1, 'week');
+                    newDate = subWeeks(date, 1);
                     break;
                 case 'PageDown':
-                    newDate = m.add(1, 'month');
+                    newDate = addMonths(date, 1);
                     break;
                 case 'PageUp':
-                    newDate = m.subtract(1, 'month');
+                    newDate = subMonths(date, 1);
                     break;
                 case 'Home':
-                    // Navigate to week start (respecting firstDayOfWeek)
-                    newDate = m.clone().day(firstDayOfWeek);
-                    // If we went forward, adjust backward to current week
-                    if (newDate.isAfter(m, 'day')) {
-                        newDate.subtract(1, 'week');
-                    }
+                    newDate = startOfWeek(date, {weekStartsOn: firstDayOfWeek});
                     break;
                 case 'End':
-                    // Navigate to week end (respecting firstDayOfWeek)
-                    newDate = m.clone().day((firstDayOfWeek + 6) % 7);
-                    // If we went backward, adjust forward to current week
-                    if (newDate.isBefore(m, 'day')) {
-                        newDate.add(1, 'week');
-                    }
+                    newDate = endOfWeek(date, {weekStartsOn: firstDayOfWeek});
                     break;
                 default:
                     return;
@@ -150,9 +150,8 @@ export const CalendarMonth = ({
 
             if (newDate) {
                 e.preventDefault();
-                const newDateObj = newDate.toDate();
-                if (isDateInRange(newDateObj, minDateAllowed, maxDateAllowed)) {
-                    onDayFocused?.(newDateObj);
+                if (isDateInRange(newDate, minDateAllowed, maxDateAllowed)) {
+                    onDayFocused?.(newDate);
                 }
             }
         },

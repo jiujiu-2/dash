@@ -125,13 +125,49 @@ describe('isDateInRange', () => {
 });
 
 describe('formatDate', () => {
-    const testDate = new Date(1997, 4, 10); // May 10, 1997
+    const testDate = new Date(1997, 4, 10); // May 10, 1997 (Saturday)
 
     it('formats dates using moment.js format strings', () => {
         expect(formatDate(testDate, 'YYYY-MM-DD')).toBe('1997-05-10');
         expect(formatDate(testDate, 'MM DD YY')).toBe('05 10 97');
         expect(formatDate(testDate, 'M, D, YYYY')).toBe('5, 10, 1997');
         expect(formatDate(testDate)).toBeTruthy(); // default format
+    });
+
+    it('handles ordinal day format (Do)', () => {
+        const date1st = new Date(2025, 0, 1);
+        const date2nd = new Date(2025, 0, 2);
+        const date3rd = new Date(2025, 0, 3);
+        const date21st = new Date(2025, 0, 21);
+
+        expect(formatDate(date1st, 'MMM Do, YYYY')).toBe('Jan 1st, 2025');
+        expect(formatDate(date2nd, 'MMM Do, YYYY')).toBe('Jan 2nd, 2025');
+        expect(formatDate(date3rd, 'MMM Do, YYYY')).toBe('Jan 3rd, 2025');
+        expect(formatDate(date21st, 'MMM Do, YYYY')).toBe('Jan 21st, 2025');
+    });
+
+    it('handles day of week abbreviation (dd)', () => {
+        // testDate is Saturday, May 10, 1997
+        expect(formatDate(testDate, 'dd, MMM D')).toBe('Sa, May 10');
+    });
+
+    it('handles quarter format (Q)', () => {
+        const q1 = new Date(2025, 0, 15); // January = Q1
+        const q2 = new Date(2025, 4, 15); // May = Q2
+        const q3 = new Date(2025, 7, 15); // August = Q3
+        const q4 = new Date(2025, 10, 15); // November = Q4
+
+        expect(formatDate(q1, 'Q-YYYY')).toBe('1-2025');
+        expect(formatDate(q2, 'Q-YYYY')).toBe('2-2025');
+        expect(formatDate(q3, 'Q-YYYY')).toBe('3-2025');
+        expect(formatDate(q4, 'Q-YYYY')).toBe('4-2025');
+    });
+
+    it('handles Unix timestamp format (X)', () => {
+        const testTimestamp = new Date(2025, 0, 1, 0, 0, 0, 0);
+        const formatted = formatDate(testTimestamp, 'X');
+        // Should be a valid Unix timestamp (seconds since epoch)
+        expect(parseInt(formatted, 10)).toBeGreaterThan(1700000000);
     });
 });
 
@@ -222,17 +258,11 @@ describe('parseYear', () => {
         expect(parseYear('2000')).toBe(2000);
     });
 
-    it('parses 2-digit years using moment.js pivot (00-68 → 2000s, 69-99 → 1900s)', () => {
-        expect(parseYear('97')).toBe(1997);
+    it('parses 2-digit years using date-fns pivot (based on reference date)', () => {
         expect(parseYear('23')).toBe(2023);
-        expect(parseYear('68')).toBe(2068);
-        expect(parseYear('69')).toBe(1969);
         expect(parseYear('00')).toBe(2000);
-    });
-
-    it('handles single-digit years', () => {
-        expect(parseYear('5')).toBe(2005);
-        expect(parseYear('0')).toBe(2000);
+        expect(parseYear('99')).toBe(1999);
+        // Pivot depends on current year - years close to now are 2000s, far future becomes 1900s
     });
 
     it('returns undefined for invalid inputs', () => {

@@ -7,7 +7,7 @@ import React, {
     useState,
     forwardRef,
 } from 'react';
-import moment from 'moment';
+import {addMonths, subMonths} from 'date-fns';
 import {
     ArrowUpIcon,
     ArrowDownIcon,
@@ -92,7 +92,7 @@ const CalendarComponent = ({
     }, [activeYear, monthFormat]);
 
     useImperativeHandle(forwardedRef, () => ({
-        focusDate: (date = moment([activeYear, activeMonth, 1]).toDate()) => {
+        focusDate: (date = new Date(activeYear, activeMonth, 1)) => {
             setFocusedDate(date);
         },
         setVisibleDate: (date: Date) => {
@@ -112,15 +112,9 @@ const CalendarComponent = ({
         prevFocusedDateRef.current = focusedDate;
 
         const halfRange = Math.floor((numberOfMonthsShown - 1) / 2);
-        const activeMonthStart = moment([activeYear, activeMonth, 1]);
-        const visibleStart = activeMonthStart
-            .clone()
-            .subtract(halfRange, 'months')
-            .toDate();
-        const visibleEnd = activeMonthStart
-            .clone()
-            .add(halfRange, 'months')
-            .toDate();
+        const activeMonthStart = new Date(activeYear, activeMonth, 1);
+        const visibleStart = subMonths(activeMonthStart, halfRange);
+        const visibleEnd = addMonths(activeMonthStart, halfRange);
 
         const focusedMonthStart = new Date(
             focusedDate.getFullYear(),
@@ -220,18 +214,17 @@ const CalendarComponent = ({
 
     const changeMonthBy = useCallback(
         (months: number) => {
-            const currentDate = moment([activeYear, activeMonth, 1]);
+            const currentDate = new Date(activeYear, activeMonth, 1);
 
             // In RTL mode, directions are reversed
             const actualMonths =
                 direction === CalendarDirection.RightToLeft ? -months : months;
 
-            const newDate = currentDate.clone().add(actualMonths, 'month');
-            const newMonthStart = newDate.toDate();
+            const newMonthStart = addMonths(currentDate, actualMonths);
 
             if (isDateInRange(newMonthStart, minDateAllowed, maxDateAllowed)) {
-                setActiveYear(newDate.year());
-                setActiveMonth(newDate.month());
+                setActiveYear(newMonthStart.getFullYear());
+                setActiveMonth(newMonthStart.getMonth());
             }
         },
         [activeYear, activeMonth, minDateAllowed, maxDateAllowed, direction]
@@ -272,11 +265,8 @@ const CalendarComponent = ({
 
     const canChangeMonthBy = useCallback(
         (months: number) => {
-            const currentDate = moment([activeYear, activeMonth, 1]);
-            const targetMonth = currentDate
-                .clone()
-                .add(months, 'month')
-                .toDate();
+            const currentDate = new Date(activeYear, activeMonth, 1);
+            const targetMonth = addMonths(currentDate, months);
 
             return isDateInRange(targetMonth, minDateAllowed, maxDateAllowed);
         },
@@ -350,15 +340,15 @@ const CalendarComponent = ({
                     // Center the view: start from (numberOfMonthsShown - 1) / 2 months before activeMonth
                     const offset =
                         i - Math.floor((numberOfMonthsShown - 1) / 2);
-                    const monthDate = moment([activeYear, activeMonth, 1]).add(
-                        offset,
-                        'months'
+                    const monthDate = addMonths(
+                        new Date(activeYear, activeMonth, 1),
+                        offset
                     );
                     return (
                         <CalendarMonth
                             key={i}
-                            year={monthDate.year()}
-                            month={monthDate.month()}
+                            year={monthDate.getFullYear()}
+                            month={monthDate.getMonth()}
                             minDateAllowed={minDateAllowed}
                             maxDateAllowed={maxDateAllowed}
                             disabledDates={disabledDates}

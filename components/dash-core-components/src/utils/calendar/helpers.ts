@@ -1,11 +1,42 @@
-import moment from 'moment';
+import {
+    format,
+    parse,
+    parseISO,
+    isValid,
+    startOfDay,
+    startOfMonth,
+    isSameDay as dateFnsIsSameDay,
+    isBefore,
+    isAfter,
+    isWithinInterval,
+    min,
+    max,
+} from 'date-fns';
 import {DatePickerSingleProps} from '../../types';
 
-export function formatDate(date?: Date, format = 'YYYY-MM-DD'): string {
+/**
+ * Converts relevant moment.js format tokens to unicode tokens suitable for use
+ * in date-fns. This maintains backwards compatibility with our publicly
+ * documented format strings while enabling us to use the date-fns library
+ * internally.
+ */
+function convertFormatTokens(momentFormat: string): string {
+    return momentFormat
+        .replace(/dd/g, 'EEEEEE') // Day of week abbreviation: Mo, Tu, We
+        .replace(/Do/g, 'do') // Ordinal day: 1st, 2nd, 3rd
+        .replace(/YYYY/g, 'yyyy') // 4-digit year
+        .replace(/YY/g, 'yy') // 2-digit year
+        .replace(/DD/g, 'dd') // Day of month with leading zero
+        .replace(/D/g, 'd') // Day of month
+        .replace(/X/g, 't'); // Unix timestamp (seconds)
+}
+
+export function formatDate(date?: Date, formatStr = 'YYYY-MM-DD'): string {
     if (!date) {
         return '';
     }
-    return moment(date).format(format);
+    const convertedFormat = convertFormatTokens(formatStr);
+    return format(date, convertedFormat);
 }
 
 /*
@@ -20,15 +51,24 @@ export function dateAsStr(
     return formatDate(date, 'YYYY-MM-DD') as `${string}-${string}-${string}`;
 }
 
-export function strAsDate(date?: string, format?: string): Date | undefined {
-    if (!date) {
+export function strAsDate(
+    dateStr?: string,
+    formatStr?: string
+): Date | undefined {
+    if (!dateStr) {
         return undefined;
     }
-    const parsed = format ? moment(date, format, true) : moment(date);
-    if (!parsed.isValid()) {
-        return undefined;
+
+    let parsed = formatStr
+        ? parse(dateStr, convertFormatTokens(formatStr), new Date())
+        : parseISO(dateStr);
+
+    // Fallback to native Date constructor for non-ISO formats
+    if (!isValid(parsed)) {
+        parsed = new Date(dateStr);
     }
-    return parsed.startOf('day').toDate();
+
+    return isValid(parsed) ? startOfDay(parsed) : undefined;
 }
 
 type AnyDayFormat = string | Date | DatePickerSingleProps['date'];
@@ -39,7 +79,17 @@ export function isSameDay(day1?: AnyDayFormat, day2?: AnyDayFormat): boolean {
     if (!day1 || !day2) {
         return false; // Only one is defined - considered different
     }
-    return moment(day1).isSame(day2, 'day');
+
+    // Convert strings to Dates using strAsDate logic
+    const date1 = typeof day1 === 'string' ? strAsDate(day1) : day1;
+    const date2 = typeof day2 === 'string' ? strAsDate(day2) : day2;
+
+    // strAsDate returns undefined for invalid dates
+    if (!date1 || !date2) {
+        return false;
+    }
+
+    return dateFnsIsSameDay(date1, date2);
 }
 
 export function isDateInRange(
@@ -47,27 +97,22 @@ export function isDateInRange(
     minDate?: Date,
     maxDate?: Date
 ): boolean {
-    const target = moment(targetDate);
+    const target = startOfDay(targetDate);
 
     // If both dates are provided, normalize them to ensure min <= max
     if (minDate && maxDate) {
-        const min = moment(minDate);
-        const max = moment(maxDate);
-        const [actualMin, actualMax] = min.isSameOrBefore(max, 'day')
-            ? [min, max]
-            : [max, min];
-
-        return (
-            target.isSameOrAfter(actualMin, 'day') &&
-            target.isSameOrBefore(actualMax, 'day')
-        );
+        const dates = [startOfDay(minDate), startOfDay(maxDate)];
+        return isWithinInterval(target, {
+            start: min(dates),
+            end: max(dates),
+        });
     }
 
-    if (minDate && target.isBefore(moment(minDate), 'day')) {
+    if (minDate && isBefore(target, startOfDay(minDate))) {
         return false;
     }
 
-    if (maxDate && target.isAfter(moment(maxDate), 'day')) {
+    if (maxDate && isAfter(target, startOfDay(maxDate))) {
         return false;
     }
 
@@ -99,10 +144,11 @@ export function isDateDisabled(
 export function formatMonth(
     year: number,
     month: number,
-    format?: string
+    formatStr?: string
 ): string {
-    const {monthFormat} = extractFormats(format);
-    return moment(new Date(year, month, 1)).format(monthFormat);
+    const {monthFormat} = extractFormats(formatStr);
+    const convertedFormat = convertFormatTokens(monthFormat);
+    return format(new Date(year, month, 1), convertedFormat);
 }
 
 /**
@@ -132,20 +178,21 @@ export function extractFormats(format?: string): {
  */
 export function getMonthOptions(
     year: number,
-    format?: string,
+    formatStr?: string,
     minDate?: Date,
     maxDate?: Date
 ): Array<{label: string; value: number; disabled?: boolean}> {
-    const {monthFormat} = extractFormats(format);
+    const {monthFormat} = extractFormats(formatStr);
+    const convertedFormat = convertFormatTokens(monthFormat);
 
     return Array.from({length: 12}, (_, i) => {
-        const monthStart = moment([year, i, 1]);
-        const label = monthStart.format(monthFormat);
+        const monthStart = new Date(year, i, 1);
+        const label = format(monthStart, convertedFormat);
 
-        // Check if this month is outside the allowed range
+        // Check if this month is outside the allowed range (month-level comparison)
         const disabled =
-            (minDate && monthStart.isBefore(moment(minDate), 'month')) ||
-            (maxDate && monthStart.isAfter(moment(maxDate), 'month'));
+            (minDate && isBefore(monthStart, startOfMonth(minDate))) ||
+            (maxDate && isAfter(monthStart, startOfMonth(maxDate)));
 
         return {label, value: i, disabled};
     });
@@ -154,15 +201,24 @@ export function getMonthOptions(
 /**
  * Formats a year according to the year format extracted from month_format.
  */
-export function formatYear(year: number, format?: string): string {
-    const {yearFormat} = extractFormats(format);
-    return moment(new Date(year, 0, 1)).format(yearFormat);
+export function formatYear(year: number, formatStr?: string): string {
+    const {yearFormat} = extractFormats(formatStr);
+    const convertedFormat = convertFormatTokens(yearFormat);
+    return format(new Date(year, 0, 1), convertedFormat);
 }
 
 /**
  * Parses a year string and converts it to a full 4-digit year.
+ * Uses date-fns pivot: 2-digit years are interpreted within ±50 years of current year.
+ * Example (when current year is 2025): 00-74 → 2000-2074, 75-99 → 1975-1999
  */
 export function parseYear(yearStr: string): number | undefined {
-    const parsed = moment(yearStr, ['YY', 'YYYY']);
-    return parsed.isValid() ? parsed.year() : undefined;
+    const formats = ['yy', 'yyyy'];
+    for (const fmt of formats) {
+        const parsed = parse(yearStr.trim(), fmt, new Date());
+        if (isValid(parsed)) {
+            return parsed.getFullYear();
+        }
+    }
+    return undefined;
 }
