@@ -1,25 +1,26 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import {
+    ArrowLeftIcon,
+    ArrowRightIcon,
     CalendarIcon,
     CaretDownIcon,
     Cross1Icon,
-    ArrowLeftIcon,
-    ArrowRightIcon,
 } from '@radix-ui/react-icons';
 import {addDays, subDays} from 'date-fns';
 import AutosizeInput from 'react-input-autosize';
+import uuid from 'uniqid';
+
+import {CalendarDirection, DatePickerRangeProps} from '../types';
 import Calendar, {CalendarHandle} from '../utils/calendar/Calendar';
-import {DatePickerRangeProps, CalendarDirection} from '../types';
 import {
     dateAsStr,
-    strAsDate,
     formatDate,
     isDateDisabled,
     isSameDay,
+    strAsDate,
 } from '../utils/calendar/helpers';
 import '../components/css/datepickers.css';
-import uuid from 'uniqid';
 
 const DatePickerRange = ({
     id,

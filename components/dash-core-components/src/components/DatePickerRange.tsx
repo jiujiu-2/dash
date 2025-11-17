@@ -6,8 +6,8 @@ import {DatePickerRangeProps, PersistedProps, PersistenceTypes} from '../types';
 const RealDatePickerRange = lazy(datePickerRange);
 
 /**
- * DatePickerRange is a tailor made component designed for selecting
- * timespan across multiple days off of a calendar.
+ * DatePickerRange is designed for selecting a timespan across multiple days off
+ * of a calendar.
  *
  * The DatePicker integrates well with the Python datetime module with the
  * startDate and endDate being returned in a string format suitable for

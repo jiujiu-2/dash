@@ -1,18 +1,19 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import {CalendarIcon, CaretDownIcon, Cross1Icon} from '@radix-ui/react-icons';
+import AutosizeInput from 'react-input-autosize';
+import uuid from 'uniqid';
+
+import {CalendarDirection, DatePickerSingleProps} from '../types';
 import Calendar, {CalendarHandle} from '../utils/calendar/Calendar';
-import {DatePickerSingleProps, CalendarDirection} from '../types';
 import {
     dateAsStr,
-    strAsDate,
     formatDate,
     isDateDisabled,
     isSameDay,
+    strAsDate,
 } from '../utils/calendar/helpers';
 import '../components/css/datepickers.css';
-import uuid from 'uniqid';
-import AutosizeInput from 'react-input-autosize';
 
 const DatePickerSingle = ({
     id,
