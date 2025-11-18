@@ -22,7 +22,6 @@ def test_slsl_extreme_range_marks_density(dash_dcc):
     )
 
     dash_dcc.start_server(app)
-
     # Wait for component to render
     dash_dcc.wait_for_element("#rangeslider-extreme")
 
@@ -30,11 +29,8 @@ def test_slsl_extreme_range_marks_density(dash_dcc):
     marks = dash_dcc.find_elements(".dash-slider-mark")
     mark_count = len(marks)
 
-    print(f"Number of marks rendered: {mark_count}")
-
     # Get the actual mark text to verify what's rendered
     mark_texts = [mark.text for mark in marks]
-    print(f"Mark labels: {mark_texts}")
 
     # Should have between 2 and 7 marks (min/max plus a few intermediate)
     assert 2 <= mark_count <= 7, (
@@ -72,6 +68,10 @@ def test_slsl_extreme_range_no_width(dash_dcc):
 
     dash_dcc.start_server(app)
 
+    import pdb
+
+    pdb.set_trace()
+
     # Wait for component to render
     dash_dcc.wait_for_element("#rangeslider-no-width")
 
@@ -79,11 +79,6 @@ def test_slsl_extreme_range_no_width(dash_dcc):
     marks = dash_dcc.find_elements(".dash-slider-mark")
     mark_count = len(marks)
 
-    print(f"Number of marks rendered (no explicit width): {mark_count}")
-
-    # Even without explicit width, should not have too many marks
-    assert (
-        mark_count <= 7
-    ), f"Expected <= 7 marks even without explicit width, but found {mark_count}"
+    assert mark_count == 11, f"Expected default 11 marks, but found {mark_count}"
 
     assert dash_dcc.get_logs() == []

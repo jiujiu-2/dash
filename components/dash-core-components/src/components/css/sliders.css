@@ -74,6 +74,10 @@
     box-shadow: 0 4px 6px -1px var(--Dash-Shading-Weak);
 }
 
+.dash-slider-thumb:focus {
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
+}
+
 .dash-slider-thumb:focus .dash-slider-tooltip,
 .dash-slider-thumb:hover .dash-slider-tooltip {
     display: block;
@@ -91,6 +95,10 @@
     color: var(--Dash-Text-Strong);
     white-space: nowrap;
     pointer-events: none;
+}
+
+.dash-slider-mark-outside-selection {
+    color: var(--Dash-Text-Disabled);
 }
 
 .dash-slider-mark:before {
@@ -119,6 +127,10 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
+    background-color: var(--Dash-Fill-Primary-Active);
+}
+
+.dash-slider-dot-outside-selection {
     background-color: var(--Dash-Fill-Disabled);
 }
 
@@ -201,6 +213,15 @@
     -webkit-appearance: textfield;
     -moz-appearance: textfield;
     appearance: textfield;
+}
+
+.dash-range-slider-input::selection,
+.dash-range-slider-input::-webkit-selection {
+    background: var(--Dash-Fill-Primary-Active);
+}
+
+.dash-range-slider-input:focus {
+    outline: none;
 }
 
 /* Hide the number input spinners */
