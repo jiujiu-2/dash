@@ -92,21 +92,28 @@ export const Option: React.FC<OptionProps> = ({
             aria-selected={isSelected}
             style={optionStyle}
         >
-            <input
-                type={inputType}
-                checked={isSelected}
-                name={id}
-                value={
-                    typeof option.value === 'boolean'
-                        ? `${option.value}`
-                        : option.value
-                }
-                disabled={!!option.disabled}
-                onChange={() => onChange(option)}
-                readOnly
-                className={inputClassNames.join(' ')}
-                style={inputStyle}
-            />
+            <span className="dash-options-list-option-wrapper">
+                <input
+                    type={inputType}
+                    checked={isSelected}
+                    name={id}
+                    value={
+                        typeof option.value === 'boolean'
+                            ? `${option.value}`
+                            : option.value
+                    }
+                    disabled={!!option.disabled}
+                    onChange={() => onChange(option)}
+                    onKeyUp={e => {
+                        if (e.key === 'Enter' && inputType === 'checkbox') {
+                            onChange(option);
+                        }
+                    }}
+                    readOnly
+                    className={inputClassNames.join(' ')}
+                    style={inputStyle}
+                />
+            </span>
             <span
                 className={labelClassNames.join(' ')}
                 style={labelStyle}
