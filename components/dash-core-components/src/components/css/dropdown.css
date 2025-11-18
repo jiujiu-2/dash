@@ -70,6 +70,10 @@
     display: inline;
 }
 
+.dash-dropdown-value-item:not(:first-child)::before {
+    content: ', ';
+}
+
 .dash-dropdown-content {
     background: var(--Dash-Fill-Inverse-Strong);
     width: fit-content;

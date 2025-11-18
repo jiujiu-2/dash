@@ -156,10 +156,12 @@ const Dropdown = (props: DropdownProps) => {
                 option => option.value === val
             );
             return (
-                <React.Fragment key={`${option?.value}-${i}`}>
+                <span
+                    key={`${option?.value}-${i}`}
+                    className="dash-dropdown-value-item"
+                >
                     {option && <OptionLabel {...option} index={i} />}
-                    {i === sanitizedValues.length - 1 ? '' : ', '}
-                </React.Fragment>
+                </span>
             );
         });
         return labels;
