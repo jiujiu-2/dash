@@ -338,4 +338,80 @@ describe('Dynamic Slider Mark Density', () => {
             expect(areAllMarksValidSteps(width660, 0, 5)).toBe(true);
         });
     });
+
+    describe('Extreme ranges with large numbers', () => {
+        test('should not create overlapping marks for range -1 to 480256671 WITHOUT width (initial render)', () => {
+            const marks = sanitizeMarks({
+                min: -1,
+                max: 480256671,
+                marks: undefined,
+                step: undefined, // Let it auto-calculate
+                sliderWidth: null, // Simulates initial render before width is measured
+            });
+
+            const positions = getMarkPositions(marks);
+
+            // Should have min and max
+            expect(positions[0]).toBe(-1);
+            expect(positions[positions.length - 1]).toBe(480256671);
+
+            // Should have reasonable number of marks to prevent overlap even without width
+            // With ~9-character labels (480256671), we need substantial spacing
+            // Labels like "45M", "95M" are ~3-4 chars, so reasonable mark count is 5-7
+            expect(positions.length).toBeGreaterThanOrEqual(2); // At least min and max
+            expect(positions.length).toBeLessThanOrEqual(11); // Not too many to cause overlap
+
+            // Even without explicit width, assume a reasonable default (330px baseline)
+            // and verify spacing would be sufficient
+            const estimatedSpacing = 330 / (positions.length - 1);
+            expect(estimatedSpacing).toBeGreaterThanOrEqual(30);
+        });
+
+        test('should not create overlapping marks for range -1 to 480256671 at 365px width', () => {
+            const marks = sanitizeMarks({
+                min: -1,
+                max: 480256671,
+                marks: undefined,
+                step: undefined, // Let it auto-calculate
+                sliderWidth: 365,
+            });
+
+            const positions = getMarkPositions(marks);
+
+            // Should have min and max
+            expect(positions[0]).toBe(-1);
+            expect(positions[positions.length - 1]).toBe(480256671);
+
+            // Should have reasonable number of marks to prevent overlap
+            // With 365px width and ~9-character labels (480256671), we need substantial spacing
+            // Estimate: 9 chars * 8px/char = 72px per label, so max ~5 marks for 365px
+            expect(positions.length).toBeGreaterThanOrEqual(2); // At least min and max
+            expect(positions.length).toBeLessThanOrEqual(7); // Not too many to cause overlap
+
+            // Verify spacing between marks is sufficient
+            // With 365px width, marks should be at least 50px apart for long labels
+            const estimatedSpacing = 365 / (positions.length - 1);
+            expect(estimatedSpacing).toBeGreaterThanOrEqual(50);
+        });
+
+        test('should handle very large ranges with appropriate step multipliers', () => {
+            const marks = sanitizeMarks({
+                min: 0,
+                max: 1000000000, // 1 billion
+                marks: undefined,
+                step: undefined,
+                sliderWidth: 330,
+            });
+
+            const positions = getMarkPositions(marks);
+
+            // Should have reasonable mark count
+            expect(positions.length).toBeGreaterThanOrEqual(2);
+            expect(positions.length).toBeLessThanOrEqual(15);
+
+            // Should include min and max
+            expect(positions[0]).toBe(0);
+            expect(positions[positions.length - 1]).toBe(1000000000);
+        });
+    });
 });
