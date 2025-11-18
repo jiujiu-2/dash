@@ -436,7 +436,9 @@ const Dropdown = (props: DropdownProps) => {
                     onOpenAutoFocus={e => e.preventDefault()}
                     onKeyDown={handleKeyDown}
                     style={{
-                        maxHeight: maxHeight ? `${maxHeight}px` : 'auto',
+                        maxHeight: maxHeight
+                            ? `min(${maxHeight}px, calc(100vh - 100px))`
+                            : 'calc(100vh - 100px)',
                     }}
                 >
                     {searchable && (
