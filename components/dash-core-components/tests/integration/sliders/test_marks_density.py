@@ -68,10 +68,6 @@ def test_slsl_extreme_range_no_width(dash_dcc):
 
     dash_dcc.start_server(app)
 
-    import pdb
-
-    pdb.set_trace()
-
     # Wait for component to render
     dash_dcc.wait_for_element("#rangeslider-no-width")
 
