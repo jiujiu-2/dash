@@ -12,7 +12,16 @@ import {
     min,
     max,
 } from 'date-fns';
+import type {Locale} from 'date-fns';
 import {DatePickerSingleProps} from '../../types';
+
+declare global {
+    interface Window {
+        dateFns?: {
+            locale?: Record<string, Locale>;
+        };
+    }
+}
 
 /**
  * Converts relevant moment.js format tokens to unicode tokens suitable for use
@@ -31,12 +40,42 @@ function convertFormatTokens(momentFormat: string): string {
         .replace(/X/g, 't'); // Unix timestamp (seconds)
 }
 
+/**
+ * Matches the user's preferred locale against the locales that have been loaded
+ * externally on the page from the assets folder or via a script tag
+ */
+export function getUserLocale(): Locale | undefined {
+    // Check if page has loaded any external locales
+    const availableLocales = window.dateFns?.locale ?? {};
+
+    // Match available locales against user locale preferences
+    const localeKeys = Object.keys(availableLocales);
+    const userLanguages = navigator.languages || [navigator.language];
+    for (const lang of userLanguages) {
+        // First check full locale string for regional variants (e.g., 'fr-CA')
+        const normalizedLang = lang.replace('-', '');
+        if (availableLocales[normalizedLang]) {
+            return availableLocales[normalizedLang];
+        }
+
+        // Fallback to simple language code (e.g., 'fr')
+        const langCode = lang.split('-')[0];
+        if (availableLocales[langCode]) {
+            return availableLocales[langCode];
+        }
+    }
+
+    // No match found against user language preferences, we'll use first
+    // loaded locale (ultimately determined by script order in HTML)
+    return availableLocales[localeKeys[0]];
+}
+
 export function formatDate(date?: Date, formatStr = 'YYYY-MM-DD'): string {
     if (!date) {
         return '';
     }
     const convertedFormat = convertFormatTokens(formatStr);
-    return format(date, convertedFormat);
+    return format(date, convertedFormat, {locale: getUserLocale()});
 }
 
 /*
@@ -59,8 +98,11 @@ export function strAsDate(
         return undefined;
     }
 
+    const locale = getUserLocale();
     let parsed = formatStr
-        ? parse(dateStr, convertFormatTokens(formatStr), new Date())
+        ? parse(dateStr, convertFormatTokens(formatStr), new Date(), {
+              locale,
+          })
         : parseISO(dateStr);
 
     // Fallback to native Date constructor for non-ISO formats
@@ -148,7 +190,9 @@ export function formatMonth(
 ): string {
     const {monthFormat} = extractFormats(formatStr);
     const convertedFormat = convertFormatTokens(monthFormat);
-    return format(new Date(year, month, 1), convertedFormat);
+    return format(new Date(year, month, 1), convertedFormat, {
+        locale: getUserLocale(),
+    });
 }
 
 /**
@@ -187,7 +231,9 @@ export function getMonthOptions(
 
     return Array.from({length: 12}, (_, i) => {
         const monthStart = new Date(year, i, 1);
-        const label = format(monthStart, convertedFormat);
+        const label = format(monthStart, convertedFormat, {
+            locale: getUserLocale(),
+        });
 
         // Check if this month is outside the allowed range (month-level comparison)
         const disabled =
@@ -204,7 +250,9 @@ export function getMonthOptions(
 export function formatYear(year: number, formatStr?: string): string {
     const {yearFormat} = extractFormats(formatStr);
     const convertedFormat = convertFormatTokens(yearFormat);
-    return format(new Date(year, 0, 1), convertedFormat);
+    return format(new Date(year, 0, 1), convertedFormat, {
+        locale: getUserLocale(),
+    });
 }
 
 /**

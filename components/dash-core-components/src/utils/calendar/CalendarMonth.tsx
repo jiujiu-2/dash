@@ -15,7 +15,12 @@ import type {Day} from 'date-fns';
 import CalendarDay from './CalendarDay';
 import CalendarDayPadding from './CalendarDayPadding';
 import {createMonthGrid} from './createMonthGrid';
-import {isDateInRange, isDateDisabled, isSameDay} from './helpers';
+import {
+    isDateInRange,
+    isDateDisabled,
+    isSameDay,
+    getUserLocale,
+} from './helpers';
 import {CalendarDirection} from '../../types';
 import '../../components/css/calendar.css';
 import CalendarMonthHeader from './CalendarMonthHeader';
@@ -94,7 +99,7 @@ export const CalendarMonth = ({
     const daysOfTheWeek = useMemo(() => {
         return Array.from({length: 7}, (_, i) => {
             const date = setDay(new Date(), (i + firstDayOfWeek) % 7);
-            return format(date, 'EEEEEE');
+            return format(date, 'EEEEEE', {locale: getUserLocale()});
         });
     }, [firstDayOfWeek]);
 
