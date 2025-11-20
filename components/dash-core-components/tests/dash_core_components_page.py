@@ -1,4 +1,5 @@
 import logging
+import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -42,6 +43,7 @@ class DashCoreComponentsMixin(object):
             matched = days[index]
 
         matched.click()
+        time.sleep(0.1)
         return date.get_attribute("value")
 
     def select_date_range(self, compid, day_range, start_first=True):

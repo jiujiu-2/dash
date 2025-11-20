@@ -4,19 +4,25 @@ module.exports = {
     roots: ['<rootDir>/tests'],
     testMatch: ['**/__tests__/**/*.{ts,tsx}', '**/?(*.)+(spec|test).{ts,tsx}'],
     transform: {
-        '^.+\\.(ts|tsx)$': ['ts-jest', {
-            tsconfig: {
-                jsx: 'react',
-                esModuleInterop: true,
-                allowSyntheticDefaultImports: true,
-                types: ['jest', '@testing-library/jest-dom'],
+        '^.+\\.(ts|tsx)$': [
+            'ts-jest',
+            {
+                tsconfig: {
+                    jsx: 'react',
+                    esModuleInterop: true,
+                    allowSyntheticDefaultImports: true,
+                    types: ['jest', '@testing-library/jest-dom'],
+                },
             },
-        }],
-        '^.+\\.js$': ['ts-jest', {
-            tsconfig: {
-                allowJs: true,
+        ],
+        '^.+\\.js$': [
+            'ts-jest',
+            {
+                tsconfig: {
+                    allowJs: true,
+                },
             },
-        }],
+        ],
     },
     collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
     moduleNameMapper: {
@@ -26,4 +32,6 @@ module.exports = {
     setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
     // Disable caching to ensure TypeScript type changes are always picked up
     cache: false,
+    // Limit workers in CI to prevent out-of-memory errors
+    maxWorkers: process.env.CI ? 2 : undefined,
 };
