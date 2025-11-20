@@ -420,6 +420,9 @@ def test_cbsc008_wildcard_prop_callbacks(dash_duo):
     dash_duo.wait_for_text_to_equal("#output-1", "hello world")
     assert dash_duo.find_element("#output-1").get_attribute("data-cb") == "hello world"
 
+    # Wait for all callbacks to complete
+    time.sleep(0.1)
+
     # an initial call, one for clearing the input
     # and one for each hello world character
     assert input_call_count.value == 2 + len("hello world")
