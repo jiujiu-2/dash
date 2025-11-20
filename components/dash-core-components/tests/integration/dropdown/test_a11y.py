@@ -99,6 +99,7 @@ def test_a11y003_keyboard_navigation(dash_duo):
     assert num_elements == 100
 
     send_keys(1)  # Expecting to be typing into the searh bar
+    sleep(0.1)  # Wait for search filtering to complete
     num_elements = len(dash_duo.find_elements(".dash-dropdown-option"))
     assert num_elements == 19
 
