@@ -33,59 +33,50 @@ const alignDecimalValue = (v: number, d: number) =>
 const alignValue = (v: number, d: number) =>
     decimalCount(d) < 1 ? alignIntValue(v, d) : alignDecimalValue(v, d);
 
+export const applyD3Format = (mark: number, min: number, max: number) => {
+    const mu_ten_factor = -3;
+    const k_ten_factor = 4; // values < 10000 don't get formatted
+
+    const ten_factor = Math.log10(Math.abs(mark));
+    if (
+        mark === 0 ||
+        (ten_factor > mu_ten_factor && ten_factor < k_ten_factor)
+    ) {
+        return String(mark);
+    }
+    const max_min_mean = (Math.abs(max) + Math.abs(min)) / 2;
+    const si_formatter = formatPrefix(',.0', max_min_mean);
+    return String(si_formatter(mark));
+};
+
 const estimateBestSteps = (
     minValue: number,
     maxValue: number,
     stepValue: number,
     sliderWidth?: number | null
 ) => {
-    let targetMarkCount = 11; // Default baseline
+    // Use formatted label length to account for SI formatting
+    // (e.g. labels that look like "100M" vs "100000000")
+    const formattedMin = applyD3Format(minValue, minValue, maxValue);
+    const formattedMax = applyD3Format(maxValue, minValue, maxValue);
+    const maxValueChars = Math.max(formattedMin.length, formattedMax.length);
 
-    // Scale mark density based on slider width
-    if (sliderWidth) {
-        const baselineWidth = 330;
-        const baselineMarkCount = 11; // 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
+    // Calculate required spacing based on label width
+    // Estimate: 10px per character + 20px margin for spacing between labels
+    // This provides comfortable spacing to prevent overlap
+    const pixelsPerChar = 10;
+    const spacingMargin = 20;
+    const minPixelsPerMark = maxValueChars * pixelsPerChar + spacingMargin;
 
-        // Calculate density multiplier based on width
-        const widthMultiplier = sliderWidth / baselineWidth;
+    const effectiveWidth = sliderWidth || 330;
 
-        // Target mark count scales with width but maintains consistent density
-        // The range adjustment should be removed - we want consistent mark density based on width
-        targetMarkCount = Math.round(baselineMarkCount * widthMultiplier);
-
-        // Ensure reasonable bounds
-        const UPPER_BOUND = 50;
-        targetMarkCount = Math.max(3, Math.min(targetMarkCount, UPPER_BOUND));
-
-        // Adjust density based on maximum character width of mark labels
-        // Estimate the maximum characters in any mark label
-        const maxValueChars = Math.max(
-            String(minValue).length,
-            String(maxValue).length,
-            String(Math.abs(minValue)).length,
-            String(Math.abs(maxValue)).length
-        );
-
-        // Baseline: 3-4 characters (like "100", "250") work well with baseline density
-        // For longer labels, reduce density to prevent overlap
-        const baselineChars = 3.5;
-        if (maxValueChars > baselineChars) {
-            const charReductionFactor = baselineChars / maxValueChars;
-            targetMarkCount = Math.round(targetMarkCount * charReductionFactor);
-            targetMarkCount = Math.max(2, targetMarkCount); // Ensure minimum of 2 marks
-        }
-    }
+    // Calculate maximum number of marks that can fit without overlap
+    let targetMarkCount = Math.floor(effectiveWidth / minPixelsPerMark) + 1;
+    targetMarkCount = Math.max(3, Math.min(targetMarkCount, 50));
 
     // Calculate the ideal interval between marks based on target count
     const range = maxValue - minValue;
-    let idealInterval = range / (targetMarkCount - 1);
-
-    // Check if the step value is fractional and adjust density
-    if (stepValue % 1 !== 0) {
-        // For fractional steps, reduce mark density by half to avoid clutter
-        targetMarkCount = Math.max(3, Math.round(targetMarkCount / 2));
-        idealInterval = range / (targetMarkCount - 1);
-    }
+    const idealInterval = range / (targetMarkCount - 1);
 
     // Calculate the multiplier needed to get close to idealInterval
     // Round to a "nice" number for cleaner mark placement
@@ -102,13 +93,13 @@ const estimateBestSteps = (
         niceMultiplier = 2;
     } else if (normalized <= 3.5) {
         niceMultiplier = 2.5;
-    } else if (normalized <= 7.5) {
+    } else if (normalized <= 5) {
         niceMultiplier = 5;
     } else {
         niceMultiplier = 10;
     }
 
-    const bestMultiplier = niceMultiplier * magnitude;
+    const bestMultiplier = Math.max(1, niceMultiplier * magnitude);
     const bestInterval = stepValue * bestMultiplier;
 
     // All marks must be at valid step positions: minValue + (n * stepValue)
@@ -174,22 +165,6 @@ export const setUndefined = (
     return definedMarks;
 };
 
-export const applyD3Format = (mark: number, min: number, max: number) => {
-    const mu_ten_factor = -3;
-    const k_ten_factor = 3;
-
-    const ten_factor = Math.log10(Math.abs(mark));
-    if (
-        mark === 0 ||
-        (ten_factor > mu_ten_factor && ten_factor < k_ten_factor)
-    ) {
-        return String(mark);
-    }
-    const max_min_mean = (Math.abs(max) + Math.abs(min)) / 2;
-    const si_formatter = formatPrefix(',.0', max_min_mean);
-    return String(si_formatter(mark));
-};
-
 export const autoGenerateMarks = (
     min: number,
     max: number,
@@ -197,8 +172,9 @@ export const autoGenerateMarks = (
     sliderWidth?: number | null
 ) => {
     const marks = [];
-    // Always use dynamic logic, but pass the provided step as a constraint
-    const effectiveStep = step || calcStep(min, max, 0);
+
+    const effectiveStep = step ?? 1;
+
     const [start, interval, chosenStep] = estimateBestSteps(
         min,
         max,

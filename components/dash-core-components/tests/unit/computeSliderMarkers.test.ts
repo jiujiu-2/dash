@@ -42,7 +42,7 @@ const areAllMarksValidSteps = (
 
 describe('Dynamic Slider Mark Density', () => {
     describe('Baseline behavior (330px width)', () => {
-        test('should show ~10-11 marks for 0-100 range with step=5', () => {
+        test('should show appropriate marks for 0-100 range with step=5 at 330px', () => {
             const marks = sanitizeMarks({
                 min: 0,
                 max: 100,
@@ -54,7 +54,9 @@ describe('Dynamic Slider Mark Density', () => {
             expect(marks).toBeDefined();
             const positions = getMarkPositions(marks);
 
-            expect(positions.length).toBe(11);
+            // With pixel-based algorithm: 3-char labels need ~50px per mark
+            // 330px / 50px = ~7 marks (plus min/max adjustment gives 8)
+            expect(positions.length).toBe(8);
             expect(areAllMarksValidSteps(marks, 0, 5)).toBe(true);
             expect(positions).toContain(0);
             expect(positions).toContain(100);
@@ -220,36 +222,17 @@ describe('Dynamic Slider Mark Density', () => {
             });
         });
 
-        test('should reduce density by half for fractional steps', () => {
-            const integerStep = sanitizeMarks({
-                min: 0,
-                max: 10,
-                marks: undefined,
-                step: 1, // Integer step
-                sliderWidth: 330,
-            });
-
+        test('should have appropriate density for fractional steps', () => {
             const fractionalStep = sanitizeMarks({
                 min: 0,
                 max: 10,
                 marks: undefined,
                 step: 0.5, // Fractional step
-                sliderWidth: 330,
+                sliderWidth: 1600,
             });
 
-            const integerPositions = getMarkPositions(integerStep);
             const fractionalPositions = getMarkPositions(fractionalStep);
-
-            // Fractional step should have roughly half the marks of integer step
-            expect(fractionalPositions.length).toBeLessThan(
-                integerPositions.length
-            );
-            expect(fractionalPositions.length).toBeLessThanOrEqual(
-                Math.ceil(integerPositions.length / 2) + 1
-            );
-
-            // Both should be valid steps
-            expect(areAllMarksValidSteps(integerStep, 0, 1)).toBe(true);
+            expect(fractionalPositions.length).toBe(21);
             expect(areAllMarksValidSteps(fractionalStep, 0, 0.5)).toBe(true);
         });
 
@@ -412,6 +395,29 @@ describe('Dynamic Slider Mark Density', () => {
             // Should include min and max
             expect(positions[0]).toBe(0);
             expect(positions[positions.length - 1]).toBe(1000000000);
+        });
+
+        test('does not have all marks labeled as "2k" for range 1952 to 2007', () => {
+            const marks = sanitizeMarks({
+                min: 1952,
+                max: 2007,
+                marks: undefined,
+                step: undefined,
+                sliderWidth: 365,
+            });
+
+            // Get all the label values (not the keys)
+            const labels = Object.values(marks);
+
+            // Count unique labels
+            const uniqueLabels = new Set(labels);
+
+            // Should have more than one unique label
+            expect(uniqueLabels.size).toBeGreaterThan(1);
+
+            // Should NOT have all labels be "2k"
+            const allLabels2k = labels.every(label => label === '2k');
+            expect(allLabels2k).toBe(false);
         });
     });
 });
