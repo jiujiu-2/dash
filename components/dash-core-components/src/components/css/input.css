@@ -48,6 +48,12 @@
     accent-color: var(--Dash-Fill-Interactive-Strong);
 }
 
+.dash-input-element::selection,
+.dash-input-element::-webkit-selection {
+    color: var(--Dash-Fill-Inverse-Strong);
+    background: var(--Dash-Fill-Interactive-Strong);
+}
+
 .dash-input-element:disabled {
     cursor: not-allowed;
 }

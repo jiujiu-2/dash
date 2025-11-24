@@ -59,7 +59,8 @@
 
 .dash-datepicker-input::selection,
 .dash-datepicker-input::-webkit-selection {
-    background: var(--Dash-Fill-Weak);
+    color: var(--Dash-Fill-Inverse-Strong);
+    background: var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-datepicker-input-wrapper:focus-within {
