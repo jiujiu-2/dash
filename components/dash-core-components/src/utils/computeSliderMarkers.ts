@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import {pickBy, isEmpty, isNil} from 'ramda';
 import {formatPrefix} from 'd3-format';
 import {SliderMarks} from '../types';
@@ -32,85 +33,74 @@ const alignDecimalValue = (v: number, d: number) =>
 const alignValue = (v: number, d: number) =>
     decimalCount(d) < 1 ? alignIntValue(v, d) : alignDecimalValue(v, d);
 
+export const applyD3Format = (mark: number, min: number, max: number) => {
+    const mu_ten_factor = -3;
+    const k_ten_factor = 4; // values < 10000 don't get formatted
+
+    const ten_factor = Math.log10(Math.abs(mark));
+    if (
+        mark === 0 ||
+        (ten_factor > mu_ten_factor && ten_factor < k_ten_factor)
+    ) {
+        return String(mark);
+    }
+    const max_min_mean = (Math.abs(max) + Math.abs(min)) / 2;
+    const si_formatter = formatPrefix(',.0', max_min_mean);
+    return String(si_formatter(mark));
+};
+
 const estimateBestSteps = (
     minValue: number,
     maxValue: number,
     stepValue: number,
     sliderWidth?: number | null
 ) => {
-    // Base desired count for 330px slider with 0-100 scale (10 marks = 11 total including endpoints)
-    let targetMarkCount = 11; // Default baseline
+    // Use formatted label length to account for SI formatting
+    // (e.g. labels that look like "100M" vs "100000000")
+    const formattedMin = applyD3Format(minValue, minValue, maxValue);
+    const formattedMax = applyD3Format(maxValue, minValue, maxValue);
+    const maxValueChars = Math.max(formattedMin.length, formattedMax.length);
 
-    // Scale mark density based on slider width
-    if (sliderWidth) {
-        const baselineWidth = 330;
-        const baselineMarkCount = 11; // 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
+    // Calculate required spacing based on label width
+    // Estimate: 10px per character + 20px margin for spacing between labels
+    // This provides comfortable spacing to prevent overlap
+    const pixelsPerChar = 10;
+    const spacingMargin = 20;
+    const minPixelsPerMark = maxValueChars * pixelsPerChar + spacingMargin;
 
-        // Calculate density multiplier based on width
-        const widthMultiplier = sliderWidth / baselineWidth;
+    const effectiveWidth = sliderWidth || 330;
 
-        // Target mark count scales with width but maintains consistent density
-        // The range adjustment should be removed - we want consistent mark density based on width
-        targetMarkCount = Math.round(baselineMarkCount * widthMultiplier);
-
-        // Ensure reasonable bounds
-        const UPPER_BOUND = 50;
-        targetMarkCount = Math.max(3, Math.min(targetMarkCount, UPPER_BOUND));
-
-        // Adjust density based on maximum character width of mark labels
-        // Estimate the maximum characters in any mark label
-        const maxValueChars = Math.max(
-            String(minValue).length,
-            String(maxValue).length,
-            String(Math.abs(minValue)).length,
-            String(Math.abs(maxValue)).length
-        );
-
-        // Baseline: 3-4 characters (like "100", "250") work well with baseline density
-        // For longer labels, reduce density to prevent overlap
-        const baselineChars = 3.5;
-        if (maxValueChars > baselineChars) {
-            const charReductionFactor = baselineChars / maxValueChars;
-            targetMarkCount = Math.round(targetMarkCount * charReductionFactor);
-            targetMarkCount = Math.max(2, targetMarkCount); // Ensure minimum of 2 marks
-        }
-    }
+    // Calculate maximum number of marks that can fit without overlap
+    let targetMarkCount = Math.floor(effectiveWidth / minPixelsPerMark) + 1;
+    targetMarkCount = Math.max(3, Math.min(targetMarkCount, 50));
 
     // Calculate the ideal interval between marks based on target count
     const range = maxValue - minValue;
-    let idealInterval = range / (targetMarkCount - 1);
+    const idealInterval = range / (targetMarkCount - 1);
 
-    // Check if the step value is fractional and adjust density
-    if (stepValue % 1 !== 0) {
-        // For fractional steps, reduce mark density by half to avoid clutter
-        targetMarkCount = Math.max(3, Math.round(targetMarkCount / 2));
-        idealInterval = range / (targetMarkCount - 1);
+    // Calculate the multiplier needed to get close to idealInterval
+    // Round to a "nice" number for cleaner mark placement
+    const rawMultiplier = idealInterval / stepValue;
+
+    // Round to nearest nice multiplier (1, 2, 2.5, 5, or power of 10 multiple)
+    const magnitude = Math.pow(10, Math.floor(Math.log10(rawMultiplier)));
+    const normalized = rawMultiplier / magnitude; // Now between 1 and 10
+
+    let niceMultiplier;
+    if (normalized <= 1.5) {
+        niceMultiplier = 1;
+    } else if (normalized <= 2.25) {
+        niceMultiplier = 2;
+    } else if (normalized <= 3.5) {
+        niceMultiplier = 2.5;
+    } else if (normalized <= 5) {
+        niceMultiplier = 5;
+    } else {
+        niceMultiplier = 10;
     }
 
-    // Find the best interval that's a multiple of stepValue
-    // Start with multiples of stepValue and find the one closest to idealInterval
-    const stepMultipliers = [
-        // eslint-disable-next-line no-magic-numbers
-        1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000,
-    ];
-
-    let bestInterval = stepValue;
-    let bestDifference = Math.abs(idealInterval - stepValue);
-
-    for (const multiplier of stepMultipliers) {
-        const candidateInterval = stepValue * multiplier;
-        const difference = Math.abs(idealInterval - candidateInterval);
-
-        if (difference < bestDifference) {
-            bestInterval = candidateInterval;
-            bestDifference = difference;
-        }
-
-        // Stop if we've gone too far beyond the ideal
-        if (candidateInterval > idealInterval * 2) {
-            break;
-        }
-    }
+    const bestMultiplier = Math.max(1, niceMultiplier * magnitude);
+    const bestInterval = stepValue * bestMultiplier;
 
     // All marks must be at valid step positions: minValue + (n * stepValue)
     // Find the first mark after minValue that fits our desired interval
@@ -175,22 +165,6 @@ export const setUndefined = (
     return definedMarks;
 };
 
-export const applyD3Format = (mark: number, min: number, max: number) => {
-    const mu_ten_factor = -3;
-    const k_ten_factor = 3;
-
-    const ten_factor = Math.log10(Math.abs(mark));
-    if (
-        mark === 0 ||
-        (ten_factor > mu_ten_factor && ten_factor < k_ten_factor)
-    ) {
-        return String(mark);
-    }
-    const max_min_mean = (Math.abs(max) + Math.abs(min)) / 2;
-    const si_formatter = formatPrefix(',.0', max_min_mean);
-    return String(si_formatter(mark));
-};
-
 export const autoGenerateMarks = (
     min: number,
     max: number,
@@ -198,8 +172,9 @@ export const autoGenerateMarks = (
     sliderWidth?: number | null
 ) => {
     const marks = [];
-    // Always use dynamic logic, but pass the provided step as a constraint
-    const effectiveStep = step || calcStep(min, max, 0);
+
+    const effectiveStep = step ?? 1;
+
     const [start, interval, chosenStep] = estimateBestSteps(
         min,
         max,
@@ -208,38 +183,18 @@ export const autoGenerateMarks = (
     );
     let cursor = start;
 
-    // Apply a safety cap to prevent excessive mark generation while preserving existing behavior
-    // Only restrict when marks would be truly excessive (much higher than the existing UPPER_BOUND)
-    const MARK_WIDTH_PX = 20; // More generous spacing for width-based calculation
-    const FALLBACK_MAX_MARKS = 200; // High fallback to preserve existing behavior when no width
-    const ABSOLUTE_MAX_MARKS = 200; // Safety cap against extreme cases
-
-    const widthBasedMax = sliderWidth
-        ? Math.max(10, Math.floor(sliderWidth / MARK_WIDTH_PX))
-        : FALLBACK_MAX_MARKS;
-
-    const maxAutoGeneratedMarks = Math.min(widthBasedMax, ABSOLUTE_MAX_MARKS);
-
-    // Calculate how many marks would be generated with current interval
-    const estimatedMarkCount = Math.floor((max - start) / interval) + 1;
-
-    // If we would exceed the limit, increase the interval to fit within the limit
-    let actualInterval = interval;
-    if (estimatedMarkCount > maxAutoGeneratedMarks) {
-        // Recalculate interval to fit exactly within the limit
-        actualInterval = (max - start) / (maxAutoGeneratedMarks - 1);
-        // Round to a reasonable step multiple to keep marks clean
-        const stepMultiple = Math.ceil(actualInterval / chosenStep);
-        actualInterval = stepMultiple * chosenStep;
-    }
-
-    if ((max - cursor) / actualInterval > 0) {
-        do {
+    if ((max - cursor) / interval > 0) {
+        while (cursor < max) {
             marks.push(alignValue(cursor, chosenStep));
-            cursor += actualInterval;
-        } while (cursor < max && marks.length < maxAutoGeneratedMarks);
+            const prevCursor = cursor;
+            cursor += interval;
 
-        // do some cosmetic
+            // Safety check: floating point precision could impact this loop
+            if (cursor <= prevCursor) {
+                break;
+            }
+        }
+
         const discardThreshold = 1.5;
         if (
             marks.length >= 2 &&
