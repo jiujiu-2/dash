@@ -3,7 +3,7 @@
     flex: 1;
     box-sizing: border-box;
     padding: 0;
-    background: inherit;
+    background: var(--Dash-Fill-Inverse-Strong);
     border: none;
     outline: none;
     width: 100%;
@@ -45,7 +45,7 @@
 }
 
 .dash-dropdown:focus {
-    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
+    border: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-dropdown:disabled {
@@ -67,6 +67,10 @@
 
 .dash-dropdown-value > * {
     display: inline;
+}
+
+.dash-dropdown-value-item:not(:first-child)::before {
+    content: ', ';
 }
 
 .dash-dropdown-content {

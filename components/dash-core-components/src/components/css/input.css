@@ -16,7 +16,7 @@
 }
 
 .dash-input-container:focus-within {
-    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
+    border: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-input-container:has(.dash-input-element:disabled) {

@@ -393,13 +393,13 @@ def test_rdcap003_side_effect_regression(dash_duo):
 
     dash_duo.wait_for_text_to_equal("#counter", "0")
     dash_duo.find_element("#a").click()
-    assert len(dash_duo.find_elements("#b label > input")) == 2
+    assert len(dash_duo.find_elements("#b label input")) == 2
     dash_duo.wait_for_text_to_equal("#counter", "0")
     dash_duo.find_element("#a").click()
-    assert len(dash_duo.find_elements("#b label > input")) == 3
+    assert len(dash_duo.find_elements("#b label input")) == 3
     dash_duo.wait_for_text_to_equal("#counter", "0")
 
-    dash_duo.find_elements("#b label > input")[0].click()
+    dash_duo.find_elements("#b label input")[0].click()
     dash_duo.wait_for_text_to_equal("#counter", "1")
 
 

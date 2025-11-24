@@ -156,10 +156,12 @@ const Dropdown = (props: DropdownProps) => {
                 option => option.value === val
             );
             return (
-                <React.Fragment key={`${option?.value}-${i}`}>
+                <span
+                    key={`${option?.value}-${i}`}
+                    className="dash-dropdown-value-item"
+                >
                     {option && <OptionLabel {...option} index={i} />}
-                    {i === sanitizedValues.length - 1 ? '' : ', '}
-                </React.Fragment>
+                </span>
             );
         });
         return labels;
@@ -434,7 +436,9 @@ const Dropdown = (props: DropdownProps) => {
                     onOpenAutoFocus={e => e.preventDefault()}
                     onKeyDown={handleKeyDown}
                     style={{
-                        maxHeight: maxHeight ? `${maxHeight}px` : 'auto',
+                        maxHeight: maxHeight
+                            ? `min(${maxHeight}px, calc(100vh - 100px))`
+                            : 'calc(100vh - 100px)',
                     }}
                 >
                     {searchable && (

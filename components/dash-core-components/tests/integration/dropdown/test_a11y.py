@@ -105,26 +105,36 @@ def test_a11y003_keyboard_navigation(dash_duo):
 
     send_keys(Keys.ARROW_DOWN)  # Expecting to be navigating through the options
     send_keys(Keys.SPACE)  # Expecting to be selecting
-    assert dash_duo.find_element(".dash-dropdown-value").text == "1"
+    value_items = dash_duo.find_elements(".dash-dropdown-value-item")
+    assert len(value_items) == 1
+    assert value_items[0].text == "1"
 
     send_keys(Keys.ARROW_DOWN)  # Expecting to be navigating through the options
     send_keys(Keys.SPACE)  # Expecting to be selecting
-    assert dash_duo.find_element(".dash-dropdown-value").text == "1, 10"
+    value_items = dash_duo.find_elements(".dash-dropdown-value-item")
+    assert len(value_items) == 2
+    assert [item.text for item in value_items] == ["1", "10"]
 
     send_keys(Keys.SPACE)  # Expecting to be de-selecting
-    assert dash_duo.find_element(".dash-dropdown-value").text == "1"
+    value_items = dash_duo.find_elements(".dash-dropdown-value-item")
+    assert len(value_items) == 1
+    assert value_items[0].text == "1"
 
     send_keys(Keys.ARROW_UP)
     send_keys(Keys.ARROW_UP)
     send_keys(Keys.ARROW_UP)  # Expecting to wrap over to the last item
     send_keys(Keys.SPACE)
-    assert dash_duo.find_element(".dash-dropdown-value").text == "1, 91"
+    value_items = dash_duo.find_elements(".dash-dropdown-value-item")
+    assert len(value_items) == 2
+    assert [item.text for item in value_items] == ["1", "91"]
 
     send_keys(
         Keys.ESCAPE
     )  # Expecting focus to remain on the dropdown after escaping out
     sleep(0.25)
-    assert dash_duo.find_element(".dash-dropdown-value").text == "1, 91"
+    value_items = dash_duo.find_elements(".dash-dropdown-value-item")
+    assert len(value_items) == 2
+    assert [item.text for item in value_items] == ["1", "91"]
 
     assert dash_duo.get_logs() == []
 

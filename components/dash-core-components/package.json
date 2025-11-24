@@ -80,7 +80,7 @@
     "@testing-library/react": "^12.1.5",
     "@types/d3-format": "^3.0.4",
     "@types/fast-isnumeric": "^1.1.2",
-    "@types/jest": "^29.5.0",
+    "@types/jest": "^29.5.14",
     "@types/js-search": "^1.4.4",
     "@types/ramda": "^0.31.0",
     "@types/react": "^16.14.8",
