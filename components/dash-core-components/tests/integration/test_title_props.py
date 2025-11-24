@@ -52,8 +52,8 @@ def test_ddot001_dropdown_radioitems_checklist_option_title(dash_dcc):
     dash_dcc.start_server(app)
 
     elements = [
-        dash_dcc.wait_for_element("#dropdown_1 .dash-dropdown-value span"),
-        dash_dcc.wait_for_element("#dropdown_2 .dash-dropdown-value span"),
+        dash_dcc.wait_for_element("#dropdown_1 .dash-dropdown-value-item span"),
+        dash_dcc.wait_for_element("#dropdown_2 .dash-dropdown-value-item span"),
         dash_dcc.wait_for_element("#checklist_1 .Select-value-label"),
         dash_dcc.wait_for_element("#radioitems_1 .Select-value-label"),
     ]
