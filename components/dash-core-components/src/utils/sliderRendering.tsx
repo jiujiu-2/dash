@@ -58,6 +58,7 @@ export const renderSliderMarks = (
     renderedMarks: SliderMarks,
     vertical: boolean,
     minMaxValues: {min_mark: number; max_mark: number},
+    selectedValues: number[] = [],
     dots: boolean,
     reverse = false
 ) => {
@@ -83,10 +84,30 @@ export const renderSliderMarks = (
                   transform: 'translateX(-50%)',
               };
 
+        // Determine if mark is outside the selected range
+        let isOutsideSelection = false;
+        if (selectedValues.length === 1) {
+            isOutsideSelection = pos > selectedValues[0];
+        } else if (selectedValues.length > 1) {
+            const [minValue, maxValue] = [
+                selectedValues[0],
+                selectedValues[selectedValues.length - 1],
+            ];
+            isOutsideSelection = pos < minValue || pos > maxValue;
+        }
+
+        const outsideClassName = isOutsideSelection
+            ? 'dash-slider-mark-outside-selection'
+            : '';
+
+        const className = `dash-slider-mark ${
+            dots ? 'with-dots' : ''
+        } ${outsideClassName}`.trim();
+
         return (
             <div
                 key={position}
-                className={`dash-slider-mark ${dots ? 'with-dots' : ''}`}
+                className={className}
                 style={{
                     ...style,
                     ...(typeof mark === 'object' && mark.style
@@ -103,6 +124,7 @@ export const renderSliderMarks = (
 export const renderSliderDots = (
     stepValue: number,
     minMaxValues: {min_mark: number; max_mark: number},
+    selectedValues: number[] = [],
     vertical: boolean,
     reverse = false
 ) => {
@@ -149,10 +171,26 @@ export const renderSliderDots = (
                       transform: 'translate(-50%, 50%)',
                   };
 
+            // Determine if dot is outside the selected range
+            let isOutsideSelection = false;
+            if (selectedValues.length === 1) {
+                isOutsideSelection = dotValue > selectedValues[0];
+            } else if (selectedValues.length > 1) {
+                const [minValue, maxValue] = [
+                    selectedValues[0],
+                    selectedValues[selectedValues.length - 1],
+                ];
+                isOutsideSelection = dotValue < minValue || dotValue > maxValue;
+            }
+
+            const className = isOutsideSelection
+                ? 'dash-slider-dot dash-slider-dot-outside-selection'
+                : 'dash-slider-dot';
+
             return (
                 <div
                     key={i}
-                    className="dash-slider-dot"
+                    className={className}
                     style={{
                         ...dotStyle,
                     }}

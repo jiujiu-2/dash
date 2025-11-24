@@ -500,6 +500,7 @@ export default function RangeSlider(props: RangeSliderProps) {
                                     renderedMarks,
                                     !!vertical,
                                     minMaxValues,
+                                    value,
                                     !!dots,
                                     !!reverse
                                 )}
@@ -508,6 +509,7 @@ export default function RangeSlider(props: RangeSliderProps) {
                                 renderSliderDots(
                                     stepValue,
                                     minMaxValues,
+                                    value,
                                     !!vertical,
                                     !!reverse
                                 )}
