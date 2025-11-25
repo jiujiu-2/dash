@@ -76,7 +76,7 @@ const DatePickerSingle = ({
         if (dateChanged) {
             setProps({date: dateAsStr(internalDate)});
         }
-    }, [date, internalDate, setProps]);
+    }, [internalDate]);
 
     const parseUserInput = useCallback(
         (focusCalendar = false) => {

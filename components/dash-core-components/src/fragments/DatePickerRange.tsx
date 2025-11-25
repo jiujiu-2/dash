@@ -143,7 +143,7 @@ const DatePickerRange = ({
             // Only end changed - send just that one
             setProps({end_date: dateAsStr(internalEndDate)});
         }
-    }, [start_date, internalStartDate, end_date, internalEndDate, updatemode]);
+    }, [internalStartDate, internalEndDate, updatemode]);
 
     const sendStartInputAsDate = useCallback(
         (focusCalendar = false) => {
