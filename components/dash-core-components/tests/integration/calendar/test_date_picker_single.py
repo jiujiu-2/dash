@@ -619,3 +619,60 @@ def test_dtps026_input_click_opens_but_keeps_focus(dash_dcc):
     ), f"Calendar should show 2026, but shows: {year_input.get_attribute('value')}"
 
     assert dash_dcc.get_logs() == []
+
+
+def test_dtps030_external_date_update(dash_dcc):
+    """Test that DatePickerSingle accepts external date updates via callback without resetting."""
+    app = Dash(__name__)
+    app.layout = html.Div(
+        [
+            html.Button("Update to 2021-06-23", id="update-btn"),
+            dcc.DatePickerSingle(
+                id="dps",
+                date="2024-11-25",
+            ),
+            html.Div(id="output"),
+        ]
+    )
+
+    @app.callback(
+        Output("dps", "date"),
+        Input("update-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def update_date(n_clicks):
+        return "2021-06-23"
+
+    @app.callback(
+        Output("output", "children"),
+        Input("dps", "date"),
+    )
+    def display_date(date):
+        return f"Date: {date}"
+
+    dash_dcc.start_server(app)
+
+    # Verify initial date
+    dash_dcc.wait_for_text_to_equal("#output", "Date: 2024-11-25")
+    input_element = dash_dcc.find_element(".dash-datepicker-input")
+    assert input_element.get_attribute("value") == "2024-11-25"
+
+    # Click button to trigger external update
+    btn = dash_dcc.find_element("#update-btn")
+    btn.click()
+
+    # Verify date was updated and stays updated (doesn't reset back)
+    dash_dcc.wait_for_text_to_equal("#output", "Date: 2021-06-23", timeout=4)
+
+    # Give it a moment to potentially incorrectly reset
+    time.sleep(0.5)
+
+    # Verify it's still the new date
+    assert (
+        dash_dcc.find_element("#output").text == "Date: 2021-06-23"
+    ), "Date should remain 2021-06-23 after external update"
+    assert (
+        input_element.get_attribute("value") == "2021-06-23"
+    ), "Input should display 2021-06-23"
+
+    assert dash_dcc.get_logs() == []

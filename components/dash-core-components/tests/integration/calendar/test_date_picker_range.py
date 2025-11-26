@@ -1,6 +1,7 @@
 from datetime import datetime
+import time
 
-from dash import Dash, html, dcc
+from dash import Dash, Input, Output, html, dcc
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
     TimeoutException,
@@ -372,5 +373,72 @@ def test_dtpr008_input_click_opens_but_keeps_focus(dash_dcc):
     assert (
         year_input.get_attribute("value") == "2026"
     ), f"Calendar should show 2026, but shows: {year_input.get_attribute('value')}"
+
+    assert dash_dcc.get_logs() == []
+
+
+def test_dtpr030_external_date_range_update(dash_dcc):
+    """Test that DatePickerRange accepts external date updates via callback without resetting."""
+    app = Dash(__name__)
+    app.layout = html.Div(
+        [
+            html.Button("Update dates", id="update-btn"),
+            dcc.DatePickerRange(
+                id="dpr",
+                start_date="2024-01-01",
+                end_date="2024-12-31",
+            ),
+            html.Div(id="output"),
+        ]
+    )
+
+    @app.callback(
+        Output("dpr", "start_date"),
+        Output("dpr", "end_date"),
+        Input("update-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def update_dates(n_clicks):
+        return "2021-06-01", "2021-06-30"
+
+    @app.callback(
+        Output("output", "children"),
+        Input("dpr", "start_date"),
+        Input("dpr", "end_date"),
+    )
+    def display_dates(start_date, end_date):
+        return f"Start: {start_date}, End: {end_date}"
+
+    dash_dcc.start_server(app)
+
+    # Verify initial dates
+    dash_dcc.wait_for_text_to_equal("#output", "Start: 2024-01-01, End: 2024-12-31")
+    start_input = dash_dcc.find_element(".dash-datepicker-start-date")
+    end_input = dash_dcc.find_element(".dash-datepicker-end-date")
+    assert start_input.get_attribute("value") == "2024-01-01"
+    assert end_input.get_attribute("value") == "2024-12-31"
+
+    # Click button to trigger external update
+    btn = dash_dcc.find_element("#update-btn")
+    btn.click()
+
+    # Verify dates were updated and stay updated (don't reset back)
+    dash_dcc.wait_for_text_to_equal(
+        "#output", "Start: 2021-06-01, End: 2021-06-30", timeout=4
+    )
+
+    # Give it a moment to potentially incorrectly reset
+    time.sleep(0.5)
+
+    # Verify they're still the new dates
+    assert (
+        dash_dcc.find_element("#output").text == "Start: 2021-06-01, End: 2021-06-30"
+    ), "Dates should remain updated after external update"
+    assert (
+        start_input.get_attribute("value") == "2021-06-01"
+    ), "Start input should display 2021-06-01"
+    assert (
+        end_input.get_attribute("value") == "2021-06-30"
+    ), "End input should display 2021-06-30"
 
     assert dash_dcc.get_logs() == []
