@@ -4,7 +4,7 @@
     display: inline-flex;
     align-items: center;
     width: 170px; /* default input width */
-    height: 32px;
+    height: 34px;
     background: var(--Dash-Fill-Inverse-Strong);
     border-radius: var(--Dash-Spacing);
     border: 1px solid var(--Dash-Stroke-Strong);
@@ -46,6 +46,12 @@
     z-index: 1;
     order: 2;
     accent-color: var(--Dash-Fill-Interactive-Strong);
+}
+
+.dash-input-element::selection,
+.dash-input-element::-webkit-selection {
+    color: var(--Dash-Fill-Inverse-Strong);
+    background: var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-input-element:disabled {

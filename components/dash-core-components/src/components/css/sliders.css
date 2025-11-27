@@ -217,7 +217,8 @@
 
 .dash-range-slider-input::selection,
 .dash-range-slider-input::-webkit-selection {
-    background: var(--Dash-Fill-Primary-Active);
+    color: var(--Dash-Fill-Inverse-Strong);
+    background: var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-range-slider-input:focus {
