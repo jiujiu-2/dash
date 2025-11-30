@@ -32,7 +32,7 @@
     background: var(--Dash-Tooltip-Background-Color);
     white-space: nowrap;
     z-index: var(--Dash-Tooltip-ZIndex);
-    pointer-events: none;
+    pointer-events: var(--Dash-Tooltip-PointerEvents);
     box-shadow: 0px 10px 38px -10px var(--Dash-Shading-Strong),
         0px 10px 20px -15px var(--Dash-Shading-Weak);
 }

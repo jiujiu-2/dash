@@ -30,7 +30,7 @@ const Tooltip = ({
         width: `${position?.x1 - position?.x0}px`,
         height: `${position?.y1 - position?.y0}px`,
         display: `${show_tooltip ? 'inline-block' : 'none'}`,
-        pointerEvents: `${targetable ? 'auto' : 'none'}`,
+        '--Dash-Tooltip-PointerEvents': targetable ? 'auto' : 'none',
         '--Dash-Tooltip-Border-Color': border_color,
         '--Dash-Tooltip-Background-Color': background_color,
         '--Dash-Tooltip-ZIndex': zindex,
