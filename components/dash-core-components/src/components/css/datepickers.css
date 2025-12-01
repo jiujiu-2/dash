@@ -8,7 +8,7 @@
     outline: none;
     width: 100%;
     font-size: inherit;
-    overflow: hidden;
+    position: relative;
     accent-color: var(--Dash-Fill-Interactive-Strong);
     outline-color: var(--Dash-Fill-Interactive-Strong);
 }
@@ -230,4 +230,9 @@
 .dash-datepicker-month-nav svg {
     width: 20px;
     height: 20px;
+}
+
+/* Override Radix's position: fixed to use position: absolute when using custom container */
+div[data-radix-popper-content-wrapper]:has(.dash-datepicker-content) {
+    position: absolute !important;
 }

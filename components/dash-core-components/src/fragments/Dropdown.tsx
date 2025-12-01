@@ -47,6 +47,7 @@ const Dropdown = (props: DropdownProps) => {
     const dropdownContentRef = useRef<HTMLDivElement>(
         document.createElement('div')
     );
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     const ctx = window.dash_component_api.useDashContext();
     const loading = ctx.useLoading();
@@ -234,22 +235,33 @@ const Dropdown = (props: DropdownProps) => {
         }
     }, [filteredOptions, isOpen]);
 
-    // Focus (and scroll) the first selected item when dropdown opens
+    // Focus first selected item or search input when dropdown opens
     useEffect(() => {
-        if (!isOpen || multi || search_value) {
+        if (!isOpen || search_value) {
             return;
         }
 
         // waiting for the DOM to be ready after the dropdown renders
         requestAnimationFrame(() => {
-            const selectedValue = sanitizedValues[0];
+            // Try to focus the first selected item (for single-select)
+            if (!multi) {
+                const selectedValue = sanitizedValues[0];
+                if (selectedValue) {
+                    const selectedElement =
+                        dropdownContentRef.current.querySelector(
+                            `.dash-options-list-option-checkbox[value="${selectedValue}"]`
+                        );
 
-            const selectedElement = dropdownContentRef.current.querySelector(
-                `.dash-options-list-option-checkbox[value="${selectedValue}"]`
-            );
+                    if (selectedElement instanceof HTMLElement) {
+                        selectedElement.focus();
+                        return;
+                    }
+                }
+            }
 
-            if (selectedElement instanceof HTMLElement) {
-                selectedElement?.focus();
+            // Fallback: focus search input if available and no selected item was focused
+            if (searchable && searchInputRef.current) {
+                searchInputRef.current.focus();
             }
         });
     }, [isOpen, multi, displayOptions, sanitizedValues]);
@@ -335,7 +347,7 @@ const Dropdown = (props: DropdownProps) => {
             } else {
                 focusableElements[nextIndex].scrollIntoView({
                     behavior: 'auto',
-                    block: 'center',
+                    block: 'nearest',
                 });
             }
         }
@@ -354,8 +366,9 @@ const Dropdown = (props: DropdownProps) => {
     );
 
     const accessibleId = id ?? uuid();
+    const positioningContainerRef = useRef<HTMLDivElement>(null);
 
-    return (
+    const popover = (
         <Popover.Root open={isOpen} onOpenChange={handleOpenChange}>
             <Popover.Trigger asChild>
                 <button
@@ -365,6 +378,7 @@ const Dropdown = (props: DropdownProps) => {
                     type="button"
                     onKeyDown={e => {
                         if (e.key === 'ArrowDown') {
+                            e.preventDefault();
                             setIsOpen(true);
                         }
                     }}
@@ -426,7 +440,7 @@ const Dropdown = (props: DropdownProps) => {
                 // container is required otherwise popover will be rendered
                 // at document root, which may be outside of the Dash app (i.e.
                 // an embedded app)
-                container={dropdownContainerRef.current?.parentElement}
+                container={positioningContainerRef.current}
             >
                 <Popover.Content
                     ref={dropdownContentRef}
@@ -451,7 +465,7 @@ const Dropdown = (props: DropdownProps) => {
                                 value={search_value || ''}
                                 autoComplete="off"
                                 onChange={e => onInputChange(e.target.value)}
-                                autoFocus
+                                ref={searchInputRef}
                             />
                             {search_value && (
                                 <button
@@ -511,6 +525,12 @@ const Dropdown = (props: DropdownProps) => {
                 </Popover.Content>
             </Popover.Portal>
         </Popover.Root>
+    );
+
+    return (
+        <div ref={positioningContainerRef} className="dash-dropdown-wrapper">
+            {popover}
+        </div>
     );
 };
 

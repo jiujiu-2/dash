@@ -37,6 +37,7 @@ def test_cdpr001_date_clearable_true_works(dash_dcc):
     assert selected, "single date should get a value"
     close_btn = dash_dcc.wait_for_element("#dps-wrapper .dash-datepicker-clear")
     close_btn.click()
+    sleep(0.25)
     (single_date,) = dash_dcc.get_date_range("dps")
     assert not single_date, "date should be cleared"
 
