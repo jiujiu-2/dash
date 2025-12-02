@@ -33,5 +33,5 @@ module.exports = {
     // Disable caching to ensure TypeScript type changes are always picked up
     cache: false,
     // Limit workers in CI to prevent out-of-memory errors
-    maxWorkers: process.env.CI ? 2 : undefined,
+    maxWorkers: 2,
 };
