@@ -185,6 +185,7 @@
     align-items: center;
     gap: 16px;
     width: 100%;
+    container-type: inline-size;
 }
 
 .dash-slider-wrapper {
@@ -208,7 +209,8 @@
 }
 
 .dash-range-slider-input {
-    width: 64px;
+    min-width: 5cqw; /* 5% of container width */
+    max-width: 15cqw; /* 15% of container width */
     text-align: center;
     -webkit-appearance: textfield;
     -moz-appearance: textfield;
@@ -230,4 +232,20 @@
 .dash-range-slider-input::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+/* Hide inputs on small containers using container queries */
+/* single slider input */
+@container (max-width: 200px) {
+    .dash-slider-container .dash-range-slider-input:only-of-type {
+        display: none;
+    }
+}
+
+/* range slider inputs */
+@container (max-width: 300px) {
+    .dash-slider-container .dash-range-slider-min-input,
+    .dash-slider-container .dash-range-slider-max-input {
+        display: none;
+    }
 }
