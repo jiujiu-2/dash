@@ -32,12 +32,12 @@
 /* Tab selected state */
 .tab--selected {
     border-top: 2px solid var(--tabs-primary);
-    color: black;
-    background-color: white;
+    color: var(--Dash-Text-Primary);
+    background-color: var(--Dash-Fill-Inverse-Strong);
 }
 
 .tab--selected:hover {
-    background-color: white;
+    background-color: var(--Dash-Fill-Inverse-Strong);
 }
 
 /* Tab disabled state */
