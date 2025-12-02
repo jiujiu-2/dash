@@ -60,9 +60,9 @@ def test_slsl002_always_visible_rangeslider(dash_dcc):
     dash_dcc.wait_for_text_to_equal("#out", "You have selected 5-15")
 
     slider = dash_dcc.find_element("#rangeslider")
-    dash_dcc.click_at_coord_fractions(slider, 0.15, 0.25)
+    dash_dcc.click_at_coord_fractions(slider, 0.2, 0.25)
     dash_dcc.wait_for_text_to_equal("#out", "You have selected 3-15")
-    dash_dcc.click_at_coord_fractions(slider, 0.5, 0.25)
+    dash_dcc.click_at_coord_fractions(slider, 0.51, 0.25)
     dash_dcc.wait_for_text_to_equal("#out", "You have selected 3-10")
 
     assert dash_dcc.get_logs() == []

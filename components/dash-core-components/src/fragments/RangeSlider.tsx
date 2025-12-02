@@ -152,7 +152,7 @@ export default function RangeSlider(props: RangeSliderProps) {
         );
 
         const maxDecimalChars = Math.min(
-            String(stepValue).split('.')[1]?.length + 1 ?? 0,
+            (String(stepValue).split('.')[1]?.length ?? -1) + 1,
             3
         );
 
