@@ -14,9 +14,9 @@ import {
     ArrowLeftIcon,
     ArrowRightIcon,
 } from '@radix-ui/react-icons';
-import Input, {HTMLInputTypes} from '../../components/Input';
+import Input from '../../components/Input';
 import Dropdown from '../../components/Dropdown';
-import {DayOfWeek, CalendarDirection} from '../../types';
+import {DayOfWeek, CalendarDirection, HTMLInputTypes} from '../../types';
 import {CalendarMonth} from './CalendarMonth';
 import {
     getMonthOptions,
