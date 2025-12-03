@@ -3,7 +3,6 @@ import * as Popover from '@radix-ui/react-popover';
 import {
     ArrowLeftIcon,
     ArrowRightIcon,
-    CalendarIcon,
     CaretDownIcon,
     Cross1Icon,
 } from '@radix-ui/react-icons';
@@ -333,7 +332,6 @@ const DatePickerRange = ({
                             }
                         }}
                     >
-                        <CalendarIcon className="dash-datepicker-trigger-icon" />
                         <AutosizeInput
                             inputRef={node => {
                                 startInputRef.current = node;
