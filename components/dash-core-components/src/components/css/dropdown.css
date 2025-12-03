@@ -19,14 +19,14 @@
     grid-template-columns: auto 1fr;
     justify-items: start;
     align-items: center;
-    gap: 8px;
+    gap: calc(var(--Dash-Spacing) * 2);
 }
 
-.dash-dropdown-grid-container:has(:nth-child(3)) {
+.dash-dropdown-grid-container:has(> :nth-child(3)) {
     grid-template-columns: auto 1fr auto;
 }
 
-.dash-dropdown-grid-container:has(:nth-child(4)) {
+.dash-dropdown-grid-container:has(> :nth-child(4)) {
     grid-template-columns: auto 1fr auto auto;
 }
 
