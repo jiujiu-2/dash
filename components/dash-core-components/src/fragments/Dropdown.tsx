@@ -264,7 +264,7 @@ const Dropdown = (props: DropdownProps) => {
                 searchInputRef.current.focus();
             }
         });
-    }, [isOpen, multi, displayOptions, sanitizedValues]);
+    }, [isOpen, multi, displayOptions]);
 
     // Handle keyboard navigation in popover
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {

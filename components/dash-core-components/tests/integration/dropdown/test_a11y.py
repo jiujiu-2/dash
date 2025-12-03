@@ -1,5 +1,5 @@
 import pytest
-from dash import Dash
+from dash import Dash, Input, Output
 from dash.dcc import Dropdown
 from dash.html import Div, Label, P
 from selenium.common.exceptions import TimeoutException
@@ -198,6 +198,57 @@ def test_a11y005_selection_visibility_multi(dash_duo):
     assert elements_are_visible(
         dash_duo, selected_options
     ), "Selected options should be visible when the dropdown opens"
+
+    assert dash_duo.get_logs() == []
+
+
+def test_a11y006_multi_select_keyboard_focus_retention(dash_duo):
+    def send_keys(key):
+        actions = ActionChains(dash_duo.driver)
+        actions.send_keys(key)
+        actions.perform()
+
+    app = Dash(__name__)
+    app.layout = Div(
+        [
+            Dropdown(
+                id="dropdown",
+                options=[f"Option {i}" for i in range(0, 10)],
+                value=[],
+                multi=True,
+                searchable=True,
+            ),
+            Div(id="output"),
+        ]
+    )
+
+    @app.callback(
+        Output("output", "children"),
+        Input("dropdown", "value"),
+    )
+    def update_output(value):
+        return f"Selected: {value}"
+
+    dash_duo.start_server(app)
+
+    dropdown = dash_duo.find_element("#dropdown")
+    dropdown.click()
+    dash_duo.wait_for_element(".dash-dropdown-options")
+
+    # Select 3 items by alternating ArrowDown and Spacebar
+    send_keys(Keys.ARROW_DOWN)  # Move to first option
+    send_keys(Keys.SPACE)  # Select Option 0
+    dash_duo.wait_for_text_to_equal("#output", "Selected: ['Option 0']")
+
+    send_keys(Keys.ARROW_DOWN)  # Move to second option
+    send_keys(Keys.SPACE)  # Select Option 1
+    dash_duo.wait_for_text_to_equal("#output", "Selected: ['Option 0', 'Option 1']")
+
+    send_keys(Keys.ARROW_DOWN)  # Move to third option
+    send_keys(Keys.SPACE)  # Select Option 2
+    dash_duo.wait_for_text_to_equal(
+        "#output", "Selected: ['Option 0', 'Option 1', 'Option 2']"
+    )
 
     assert dash_duo.get_logs() == []
 
