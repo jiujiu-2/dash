@@ -289,7 +289,7 @@ const Dropdown = (props: DropdownProps) => {
         }
 
         const focusableElements = e.currentTarget.querySelectorAll(
-            'input[type="search"], input[type="checkbox"]:not([disabled])'
+            'input[type="search"], input:not([disabled])'
         ) as NodeListOf<HTMLElement>;
 
         // Don't interfere with the event if there aren't any options that the user can interact with
@@ -505,6 +505,7 @@ const Dropdown = (props: DropdownProps) => {
                                 options={displayOptions}
                                 selected={sanitizedValues}
                                 onSelectionChange={updateSelection}
+                                inputType={multi ? 'checkbox' : 'radio'}
                                 className="dash-dropdown-options"
                                 optionClassName="dash-dropdown-option"
                                 optionStyle={{
