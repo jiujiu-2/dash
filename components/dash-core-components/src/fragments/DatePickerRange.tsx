@@ -135,6 +135,12 @@ const DatePickerRange = ({
                 start_date: dateAsStr(internalStartDate),
                 end_date: dateAsStr(internalEndDate),
             });
+        } else if (!internalStartDate && !internalEndDate) {
+            // Both dates cleared - send undefined for both
+            setProps({
+                start_date: dateAsStr(internalStartDate),
+                end_date: dateAsStr(internalEndDate),
+            });
         } else if (updatemode === 'singledate' && internalStartDate) {
             // Only start changed - send just that one
             setProps({start_date: dateAsStr(internalStartDate)});
