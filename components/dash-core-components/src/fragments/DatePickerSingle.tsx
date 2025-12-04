@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import * as Popover from '@radix-ui/react-popover';
-import {CalendarIcon, CaretDownIcon, Cross1Icon} from '@radix-ui/react-icons';
+import {CaretDownIcon, Cross1Icon} from '@radix-ui/react-icons';
 import AutosizeInput from 'react-input-autosize';
 import uuid from 'uniqid';
 
@@ -170,7 +170,6 @@ const DatePickerSingle = ({
                             }
                         }}
                     >
-                        <CalendarIcon className="dash-datepicker-trigger-icon" />
                         <AutosizeInput
                             inputRef={node => {
                                 inputRef.current = node;

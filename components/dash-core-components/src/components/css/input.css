@@ -3,7 +3,7 @@
     position: relative;
     display: inline-flex;
     align-items: center;
-    width: 170px; /* default input width */
+    width: 100%;
     height: 34px;
     background: var(--Dash-Fill-Inverse-Strong);
     border-radius: var(--Dash-Spacing);

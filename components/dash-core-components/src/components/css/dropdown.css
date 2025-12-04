@@ -19,14 +19,14 @@
     grid-template-columns: auto 1fr;
     justify-items: start;
     align-items: center;
-    gap: 8px;
+    gap: calc(var(--Dash-Spacing) * 2);
 }
 
-.dash-dropdown-grid-container:has(:nth-child(3)) {
+.dash-dropdown-grid-container:has(> :nth-child(3)) {
     grid-template-columns: auto 1fr auto;
 }
 
-.dash-dropdown-grid-container:has(:nth-child(4)) {
+.dash-dropdown-grid-container:has(> :nth-child(4)) {
     grid-template-columns: auto 1fr auto auto;
 }
 
@@ -211,4 +211,14 @@
 .dash-dropdown-option {
     padding: calc(var(--Dash-Spacing) * 2) calc(var(--Dash-Spacing) * 3);
     box-shadow: 0 -1px 0 0 var(--Dash-Fill-Disabled) inset;
+}
+
+/* Positioning container for the dropdown */
+.dash-dropdown-wrapper {
+    position: relative;
+}
+
+/* Override Radix's position: fixed to use position: absolute when using custom container */
+div[data-radix-popper-content-wrapper]:has(.dash-dropdown-content) {
+    position: absolute !important;
 }

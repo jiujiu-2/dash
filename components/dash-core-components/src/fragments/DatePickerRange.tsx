@@ -3,7 +3,6 @@ import * as Popover from '@radix-ui/react-popover';
 import {
     ArrowLeftIcon,
     ArrowRightIcon,
-    CalendarIcon,
     CaretDownIcon,
     Cross1Icon,
 } from '@radix-ui/react-icons';
@@ -132,6 +131,12 @@ const DatePickerRange = ({
 
         if (internalStartDate && internalEndDate) {
             // Both dates are set - send both
+            setProps({
+                start_date: dateAsStr(internalStartDate),
+                end_date: dateAsStr(internalEndDate),
+            });
+        } else if (!internalStartDate && !internalEndDate) {
+            // Both dates cleared - send undefined for both
             setProps({
                 start_date: dateAsStr(internalStartDate),
                 end_date: dateAsStr(internalEndDate),
@@ -333,7 +338,6 @@ const DatePickerRange = ({
                             }
                         }}
                     >
-                        <CalendarIcon className="dash-datepicker-trigger-icon" />
                         <AutosizeInput
                             inputRef={node => {
                                 startInputRef.current = node;

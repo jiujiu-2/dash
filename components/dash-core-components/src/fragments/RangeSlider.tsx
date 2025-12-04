@@ -45,9 +45,8 @@ export default function RangeSlider(props: RangeSliderProps) {
     // For range slider, we expect an array of values
     const [value, setValue] = useState<number[]>(propValue || []);
 
-    // Track slider dimension (width for horizontal, height for vertical) for conditional input rendering
+    // Track slider dimension (width for horizontal, height for vertical) for marks rendering
     const [sliderWidth, setSliderWidth] = useState<number | null>(null);
-    const [showInputs, setShowInputs] = useState<boolean>(value.length === 2);
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -64,22 +63,9 @@ export default function RangeSlider(props: RangeSliderProps) {
         }
     }, []);
 
-    // Dynamic dimension detection using ResizeObserver (width for horizontal, height for vertical)
+    // Dynamic dimension detection using ResizeObserver for marks rendering
     useEffect(() => {
         if (!sliderRef.current) {
-            return;
-        }
-
-        if (step === null) {
-            // If the user has explicitly disabled stepping (step=None), then
-            // the slider values are constrained to the given marks and user
-            // cannot enter arbitrary values via the input element
-            setShowInputs(false);
-            return;
-        }
-
-        if (!value || value.length > 2) {
-            setShowInputs(false);
             return;
         }
 
@@ -90,16 +76,6 @@ export default function RangeSlider(props: RangeSliderProps) {
                 const dimension = vertical ? rect.height : rect.width;
                 if (dimension > 0) {
                     setSliderWidth(dimension);
-
-                    // eslint-disable-next-line no-magic-numbers
-                    const HIDE_AT_WIDTH = value.length === 1 ? 200 : 250;
-                    // eslint-disable-next-line no-magic-numbers
-                    const SHOW_AT_WIDTH = value.length === 1 ? 300 : 450;
-                    if (showInputs && dimension < HIDE_AT_WIDTH) {
-                        setShowInputs(false);
-                    } else if (!showInputs && dimension >= SHOW_AT_WIDTH) {
-                        setShowInputs(true);
-                    }
                 }
             }
         };
@@ -119,7 +95,7 @@ export default function RangeSlider(props: RangeSliderProps) {
         return () => {
             resizeObserver.disconnect();
         };
-    }, [showInputs, vertical, step, value]);
+    }, [vertical]);
 
     // Handle prop value changes - equivalent to componentWillReceiveProps
     useEffect(() => {
@@ -168,49 +144,23 @@ export default function RangeSlider(props: RangeSliderProps) {
         });
     }, [min, max, processedMarks, step, sliderWidth]);
 
-    // Calculate dynamic input width based on digits needed and container size
+    // Calculate dynamic input width based on min/max values
     const inputWidth = useMemo(() => {
-        if (!sliderWidth) {
-            return '64px'; // fallback to current width
-        }
-
-        // Count digits needed for min and max values
-        const maxDigits = Math.max(
-            String(Math.floor(Math.abs(minMaxValues.max_mark))).length,
-            String(Math.floor(Math.abs(minMaxValues.min_mark))).length
+        const maxIntegerChars = Math.max(
+            String(Math.floor(minMaxValues.max_mark)).length,
+            String(Math.floor(minMaxValues.min_mark)).length
         );
 
-        // Add 1 for minus sign if min is negative
-        const totalChars = maxDigits + (minMaxValues.min_mark < 0 ? 1 : 0);
-
-        // Calculate width as percentage of container (5% min, 15% max)
-        /* eslint-disable no-magic-numbers */
-        const minWidth = sliderWidth * 0.05;
-        const maxWidth = sliderWidth * 0.15;
-        const charBasedWidth = totalChars * 12; // approx 12px per character
-        /* eslint-enable no-magic-numbers */
-
-        const calculatedWidth = Math.max(
-            minWidth,
-            Math.min(maxWidth, charBasedWidth)
+        const maxDecimalChars = Math.min(
+            (String(stepValue).split('.')[1]?.length ?? -1) + 1,
+            3
         );
 
-        // Add padding if box-sizing is border-box
-        let inputPadding = 0;
-        if (inputRef.current) {
-            const computedStyle = window.getComputedStyle(inputRef.current);
-            if (computedStyle.boxSizing === 'border-box') {
-                const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
-                const paddingRight =
-                    parseFloat(computedStyle.paddingRight) || 0;
-                inputPadding = paddingLeft + paddingRight;
-            }
-        }
+        const totalChars = maxIntegerChars + maxDecimalChars;
+        const charWidth = 12;
 
-        const totalWidth = calculatedWidth + inputPadding;
-
-        return `${totalWidth}px`;
-    }, [sliderWidth, minMaxValues.min_mark, minMaxValues.max_mark]);
+        return `${totalChars * charWidth}px`;
+    }, [minMaxValues.min_mark, minMaxValues.max_mark, stepValue]);
 
     const valueIsValid = (val: number): boolean => {
         // Check if value is within min/max bounds
@@ -312,11 +262,17 @@ export default function RangeSlider(props: RangeSliderProps) {
 
     const classNames = ['dash-slider-container', className].filter(Boolean);
 
+    // Determine if inputs should be rendered at all (CSS will handle responsive visibility)
+    const shouldShowInputs =
+        step !== null && // Not disabled by step=None
+        value.length <= 2 && // Only for single or range sliders
+        !vertical; // Only for horizontal sliders
+
     return (
         <LoadingElement>
             {loadingProps => (
                 <div id={id} className={classNames.join(' ')} {...loadingProps}>
-                    {showInputs && value.length === 2 && !vertical && (
+                    {shouldShowInputs && value.length === 2 && (
                         <input
                             type="number"
                             className="dash-input-container dash-range-slider-input dash-range-slider-min-input"
@@ -381,7 +337,7 @@ export default function RangeSlider(props: RangeSliderProps) {
                             disabled={disabled}
                         />
                     )}
-                    {showInputs && !vertical && (
+                    {shouldShowInputs && (
                         <input
                             ref={inputRef}
                             type="number"

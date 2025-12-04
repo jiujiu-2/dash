@@ -54,7 +54,9 @@ export default function RadioItems({
                     options={sanitizedOptions}
                     selected={isNil(value) ? [] : [value]}
                     onSelectionChange={selection => {
-                        setProps({value: selection[selection.length - 1]});
+                        if (selection.length) {
+                            setProps({value: selection[selection.length - 1]});
+                        }
                     }}
                     {...stylingProps}
                 />
