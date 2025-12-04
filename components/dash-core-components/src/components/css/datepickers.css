@@ -20,23 +20,23 @@
     align-items: center;
     gap: calc(var(--Dash-Spacing) * 2);
     box-sizing: border-box;
-    padding: 0 calc(var(--Dash-Spacing) * 2);
+    padding: 0 12px;
 }
 
-.dash-datepicker-input-wrapper:has(:nth-child(3)) {
-    grid-template-columns: auto 1fr auto;
+.dash-datepicker-input-wrapper:has(> :nth-child(2)) {
+    grid-template-columns: 1fr auto;
 }
 
-.dash-datepicker-input-wrapper:has(:nth-child(4)) {
-    grid-template-columns: auto 1fr auto auto;
+.dash-datepicker-input-wrapper:has(> :nth-child(3)) {
+    grid-template-columns: 1fr auto auto;
 }
 
-.dash-datepicker-input-wrapper:has(:nth-child(5)) {
-    grid-template-columns: auto auto auto 1fr auto;
+.dash-datepicker-input-wrapper:has(> :nth-child(4)) {
+    grid-template-columns: auto auto 1fr auto;
 }
 
-.dash-datepicker-input-wrapper:has(:nth-child(6)) {
-    grid-template-columns: auto auto auto 1fr auto auto;
+.dash-datepicker-input-wrapper:has(> :nth-child(5)) {
+    grid-template-columns: auto auto 1fr auto auto;
 }
 
 .dash-datepicker-input-wrapper,
@@ -55,6 +55,7 @@
     border-radius: 4px;
     padding: 0;
     background-color: inherit;
+    color: inherit;
 }
 
 .dash-datepicker-input::selection,

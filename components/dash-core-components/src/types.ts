@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ButtonHTMLAttributes, DetailedHTMLProps} from 'react';
 import {BaseDashProps, DashComponent} from '@dash-renderer/types';
 
 export enum PersistenceTypes {
@@ -51,6 +51,117 @@ export interface BaseDccProps<T>
      */
     persistence_type?: PersistenceTypes;
 }
+
+export type ButtonProps = BaseDccProps<ButtonProps> & {
+    /**
+     * The children of this component.
+     */
+    children?: React.ReactNode;
+    /**
+     * Defines the type of the element.
+     */
+    type?: 'submit' | 'reset' | 'button';
+    /**
+     * The element should be automatically focused after the page loaded.
+     */
+    autoFocus?: boolean;
+    /**
+     * Indicates whether the user can interact with the element.
+     */
+    disabled?: boolean;
+    /**
+     * Indicates the form that is the owner of the element.
+     */
+    form?: string;
+    /**
+     * Indicates the action of the element, overriding the action defined in the <form>.
+     */
+    formAction?: string;
+    /**
+     * If the button/input is a submit button (type="submit"), this attribute sets the encoding type to use during form submission. If this attribute is specified, it overrides the enctype attribute of the button's form owner.
+     */
+    formEncType?: string;
+    /**
+     * If the button/input is a submit button (type="submit"), this attribute sets the submission method to use during form submission (GET, POST, etc.). If this attribute is specified, it overrides the method attribute of the button's form owner.
+     */
+    formMethod?: string;
+    /**
+     * If the button/input is a submit button (type="submit"), this boolean attribute specifies that the form is not to be validated when it is submitted. If this attribute is specified, it overrides the novalidate attribute of the button's form owner.
+     */
+    formNoValidate?: boolean;
+    /**
+     * If the button/input is a submit button (type="submit"), this attribute specifies the browsing context (for example, tab, window, or inline frame) in which to display the response that is received after submitting the form. If this attribute is specified, it overrides the target attribute of the button's form owner.
+     */
+    formTarget?: string;
+    /**
+     * Name of the element. For example used by the server to identify the fields in form submits.
+     */
+    name?: string;
+    /**
+     * Defines a default value which will be displayed in the element on page load.
+     */
+    value?: string | string[] | number;
+    /**
+     * Keyboard shortcut to activate or add focus to the element.
+     */
+    accessKey?: string;
+    /**
+     * Indicates whether the element's content is editable.
+     */
+    contentEditable?: boolean | 'true' | 'false' | 'inherit';
+    /**
+     * Defines the text direction. Allowed values are ltr (Left-To-Right) or rtl (Right-To-Left).
+     */
+    dir?: string;
+    /**
+     * Defines whether the element can be dragged.
+     */
+    draggable?: boolean;
+    /**
+     * Prevents rendering of given element, while keeping child elements, e.g. script elements, active.
+     */
+    hidden?: boolean;
+    /**
+     * Defines the language used in the element.
+     */
+    lang?: string;
+    /**
+     * Defines the role of an element in the context of accessibility.
+     */
+    role?: string;
+    /**
+     * Indicates whether spell checking is allowed for the element.
+     */
+    spellCheck?: boolean;
+    /**
+     * Defines CSS styles which will override styles previously set.
+     */
+    style?: React.CSSProperties;
+    /**
+     * Overrides the browser's default tab order and follows the one specified instead.
+     */
+    tabIndex?: number;
+    /**
+     * Text to be displayed in a tooltip when hovering over the element.
+     */
+    title?: string;
+    /**
+     * Number of times the button lost focus.
+     */
+    n_blur?: number;
+    /**
+     * Last time the button lost focus.
+     */
+    n_blur_timestamp?: number;
+    /**
+     * Number of times the button has been clicked.
+     */
+    n_clicks?: number;
+    /**
+     * Last time the button was clicked.
+     */
+    n_clicks_timestamp?: number;
+};
 
 export enum HTMLInputTypes {
     // Only allowing the input types with wide browser compatibility

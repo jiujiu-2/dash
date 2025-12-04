@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import Button from './components/Button';
 import Checklist from './components/Checklist';
 import Clipboard from './components/Clipboard.react';
 import ConfirmDialog from './components/ConfirmDialog.react';
@@ -28,6 +29,7 @@ import Upload from './components/Upload.react';
 import './components/css/dcc.css';
 
 export {
+    Button,
     Checklist,
     Clipboard,
     ConfirmDialog,
