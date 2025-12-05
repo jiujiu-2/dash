@@ -2,13 +2,15 @@
 All notable changes to `dash` will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## UNRELEASED
+## [4.0.0rc4] - 2025-12-04
 
 ## Added
+- New `dcc.Button` component that mirrors `html.Button` but with default styles applied
+
+## [4.0.0rc3] - 2025-11-27
 - Modernized `dcc.Tabs`
 - Modernized `dcc.DatePickerSingle` and `dcc.DatePickerRange`
 - DatePicker calendars can now accept translations as an external script, either with Dash's `external_scripts` or from the assets folder. See [documentation](https://date-fns.org/v4.1.0/docs/CDN) for the underlying library that supports this.
-- New `dcc.Button` component that mirrors `html.Button` but with default styles applied
 
 ## Changed
 - `dcc.Tab` now accepts a `width` prop which can be a pixel or percentage width for an individual tab.
