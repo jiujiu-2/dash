@@ -111,13 +111,20 @@ Upload.propTypes = {
 
     /**
      * Allow dropping multiple files.
-     * When true, also enables folder selection and drag-and-drop,
-     * allowing users to upload entire folders. The folder hierarchy
-     * is preserved in the filenames (e.g., 'folder/subfolder/file.txt').
-     * Note: Folder support is available in Chrome, Edge, and Opera.
-     * Other browsers will fall back to file-only mode.
+     * When true, enables folder drag-and-drop support.
+     * The folder hierarchy is preserved in filenames (e.g., 'folder/subfolder/file.txt').
+     * Note: Folder drag-and-drop is supported in Chrome, Edge, and Opera.
      */
     multiple: PropTypes.bool,
+
+    /**
+     * Enable folder selection in the file picker dialog.
+     * When true with multiple=True, the file picker allows selecting folders instead of files.
+     * Note: When folder selection is enabled, individual files cannot be selected via the button.
+     * Use separate Upload components if you need both file and folder selection options.
+     * Folder selection is supported in Chrome, Edge, and Opera.
+     */
+    enable_folder_selection: PropTypes.bool,
 
     /**
      * HTML class name of the component
@@ -171,6 +178,7 @@ Upload.defaultProps = {
     max_size: -1,
     min_size: 0,
     multiple: false,
+    enable_folder_selection: false,
     style: {},
     style_active: {
         borderStyle: 'solid',

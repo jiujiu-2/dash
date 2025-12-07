@@ -23,24 +23,24 @@ export default class Upload extends Component {
 
         return acceptList.some(acceptItem => {
             const item = acceptItem.trim().toLowerCase();
-            
+
             // Exact MIME type match
             if (item === fileType) {
                 return true;
             }
-            
+
             // Wildcard MIME type (e.g., image/*)
             if (item.endsWith('/*')) {
                 const wildcardSuffixLength = 2;
                 const baseType = item.slice(0, -wildcardSuffixLength);
                 return fileType.startsWith(baseType + '/');
             }
-            
+
             // File extension match (e.g., .jpg)
             if (item.startsWith('.')) {
                 return fileName.endsWith(item);
             }
-            
+
             return false;
         });
     }
@@ -49,30 +49,30 @@ export default class Upload extends Component {
     async traverseFileTree(item, path = '') {
         const {accept} = this.props;
         const files = [];
-        
+
         if (item.isFile) {
-            return new Promise((resolve) => {
-                item.file((file) => {
+            return new Promise(resolve => {
+                item.file(file => {
                     // Check if file matches accept criteria
                     if (!this.fileMatchesAccept(file, accept)) {
                         resolve([]);
                         return;
                     }
-                    
+
                     // Preserve folder structure in file name
                     const relativePath = path + file.name;
                     Object.defineProperty(file, 'name', {
                         writable: true,
-                        value: relativePath
+                        value: relativePath,
                     });
                     resolve([file]);
                 });
             });
         } else if (item.isDirectory) {
             const dirReader = item.createReader();
-            return new Promise((resolve) => {
+            return new Promise(resolve => {
                 const readEntries = () => {
-                    dirReader.readEntries(async (entries) => {
+                    dirReader.readEntries(async entries => {
                         if (entries.length === 0) {
                             resolve(files);
                         } else {
@@ -97,7 +97,7 @@ export default class Upload extends Component {
     // Custom data transfer handler that supports folders
     async getDataTransferItems(event) {
         const {multiple} = this.props;
-        
+
         // If multiple is not enabled, use default behavior (files only)
         if (!multiple) {
             if (event.dataTransfer) {
@@ -112,10 +112,12 @@ export default class Upload extends Component {
         if (event.dataTransfer && event.dataTransfer.items) {
             const items = Array.from(event.dataTransfer.items);
             const files = [];
-            
+
             for (const item of items) {
                 if (item.kind === 'file') {
-                    const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : null;
+                    const entry = item.webkitGetAsEntry
+                        ? item.webkitGetAsEntry()
+                        : null;
                     if (entry) {
                         const entryFiles = await this.traverseFileTree(entry);
                         files.push(...entryFiles);
@@ -130,17 +132,17 @@ export default class Upload extends Component {
             }
             return files;
         }
-        
+
         // Handle file picker (already works with webkitdirectory attribute)
         if (event.target && event.target.files) {
             return Array.from(event.target.files);
         }
-        
+
         // Fallback
         if (event.dataTransfer && event.dataTransfer.files) {
             return Array.from(event.dataTransfer.files);
         }
-        
+
         return [];
     }
 
@@ -189,6 +191,7 @@ export default class Upload extends Component {
             max_size,
             min_size,
             multiple,
+            enable_folder_selection,
             className,
             className_active,
             className_reject,
@@ -203,13 +206,16 @@ export default class Upload extends Component {
         const disabledStyle = className_disabled ? undefined : style_disabled;
         const rejectStyle = className_reject ? undefined : style_reject;
 
-        // For react-dropzone v4.1.2, we need to add webkitdirectory attribute manually
-        // when multiple is enabled to support folder selection
-        const inputProps = multiple ? {
-            webkitdirectory: 'true',
-            directory: 'true',
-            mozdirectory: 'true'
-        } : {};
+        // Enable folder selection in file picker when explicitly requested
+        // Note: This makes individual files unselectable in the file picker
+        const inputProps =
+            multiple && enable_folder_selection
+                ? {
+                      webkitdirectory: 'true',
+                      directory: 'true',
+                      mozdirectory: 'true',
+                  }
+                : {};
 
         return (
             <LoadingElement id={id}>
