@@ -213,6 +213,12 @@
     box-shadow: 0 -1px 0 0 var(--Dash-Fill-Disabled) inset;
 }
 
+.dash-dropdown-option input[type='radio'] {
+    width: 0;
+    margin: 0;
+    outline: none;
+}
+
 /* Positioning container for the dropdown */
 .dash-dropdown-wrapper {
     position: relative;
