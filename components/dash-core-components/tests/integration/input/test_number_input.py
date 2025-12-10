@@ -1,5 +1,6 @@
 import time
 import sys
+from dash import Dash, Input, Output, html, dcc
 from selenium.webdriver.common.keys import Keys
 
 
@@ -117,6 +118,32 @@ def test_inni004_steppers(dash_dcc, debounce_number_app):
     assert (
         increment_btn.get_attribute("disabled") == "true"
     ), "Increment should be disabled at maximum"
+
+    assert dash_dcc.get_logs() == []
+
+
+def test_inni005_stepper_decrement_bug(dash_dcc, input_range_app):
+    """Test that decrement button works correctly with min/max constraints on initial render."""
+
+    app = Dash(__name__)
+    app.layout = html.Div(
+        [
+            dcc.Input(id="number", value=17, type="number", min=10, max=23),
+            html.Div(id="output"),
+        ]
+    )
+
+    @app.callback(Output("output", "children"), [Input("number", "value")])
+    def update_output(val):
+        return val
+
+    dash_dcc.start_server(app)
+
+    decrement_btn = dash_dcc.find_element(".dash-stepper-decrement")
+
+    # Initial value is 17, should be able to decrement to 16
+    decrement_btn.click()
+    dash_dcc.wait_for_text_to_equal("#output", "16")
 
     assert dash_dcc.get_logs() == []
 

@@ -141,5 +141,5 @@
 }
 
 input.dash-input-element:invalid {
-    outline: solid red;
+    color: red;
 }
