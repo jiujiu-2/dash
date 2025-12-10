@@ -9,6 +9,8 @@
     width: 100%;
     accent-color: var(--Dash-Fill-Interactive-Strong);
     outline-color: var(--Dash-Fill-Interactive-Strong);
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .dash-textarea:disabled {

@@ -215,6 +215,8 @@
     -webkit-appearance: textfield;
     -moz-appearance: textfield;
     appearance: textfield;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .dash-range-slider-input::selection,

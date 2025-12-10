@@ -46,6 +46,8 @@
     z-index: 1;
     order: 2;
     accent-color: var(--Dash-Fill-Interactive-Strong);
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .dash-input-element::selection,

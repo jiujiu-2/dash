@@ -11,6 +11,8 @@
     border: 1px solid var(--Dash-Fill-Interactive-Strong);
     box-sizing: border-box;
     vertical-align: middle;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 /* Hover state - stronger background */
