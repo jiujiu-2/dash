@@ -178,9 +178,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--Dash-Spacing);
+    gap: calc(var(--Dash-Spacing) * 2);
     margin-bottom: calc(var(--Dash-Spacing) * 2);
-    font-size: 14px;
+    font-size: inherit;
 }
 
 .dash-datepicker-controls .dash-dropdown {
