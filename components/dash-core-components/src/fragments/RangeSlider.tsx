@@ -157,9 +157,8 @@ export default function RangeSlider(props: RangeSliderProps) {
         );
 
         const totalChars = maxIntegerChars + maxDecimalChars;
-        const charWidth = 12;
 
-        return `${totalChars * charWidth}px`;
+        return `calc(${totalChars}ch + calc(var(--Dash-Spacing) * 2))`;
     }, [minMaxValues.min_mark, minMaxValues.max_mark, stepValue]);
 
     const valueIsValid = (val: number): boolean => {
