@@ -283,7 +283,7 @@ const Dropdown = (props: DropdownProps) => {
         // Don't interfere with the event if the user is using Home/End keys on the search input
         if (
             ['Home', 'End'].includes(e.key) &&
-            document.activeElement instanceof HTMLInputElement
+            document.activeElement === searchInputRef.current
         ) {
             return;
         }
@@ -367,6 +367,7 @@ const Dropdown = (props: DropdownProps) => {
 
     const accessibleId = id ?? uuid();
     const positioningContainerRef = useRef<HTMLDivElement>(null);
+    const canClearValues = clearable && !disabled && !!sanitizedValues.length;
 
     const popover = (
         <Popover.Root open={isOpen} onOpenChange={handleOpenChange}>
@@ -377,9 +378,19 @@ const Dropdown = (props: DropdownProps) => {
                     disabled={disabled}
                     type="button"
                     onKeyDown={e => {
-                        if (e.key === 'ArrowDown') {
+                        if (['ArrowDown', 'Enter'].includes(e.key)) {
                             e.preventDefault();
+                        }
+                    }}
+                    onKeyUp={e => {
+                        if (['ArrowDown', 'Enter'].includes(e.key)) {
                             setIsOpen(true);
+                        }
+                        if (
+                            ['Delete', 'Backspace'].includes(e.key) &&
+                            canClearValues
+                        ) {
+                            handleClear();
                         }
                     }}
                     className={`dash-dropdown ${className ?? ''}`}
@@ -417,7 +428,7 @@ const Dropdown = (props: DropdownProps) => {
                                 )}
                             </span>
                         )}
-                        {clearable && !disabled && !!sanitizedValues.length && (
+                        {canClearValues && (
                             <a
                                 className="dash-dropdown-clear"
                                 onClick={e => {
