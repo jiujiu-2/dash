@@ -47,6 +47,7 @@
 
 .dash-dropdown:focus {
     border: 1px solid var(--Dash-Fill-Interactive-Strong);
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-dropdown:disabled {
@@ -119,6 +120,7 @@
 
 .dash-dropdown-search-container:focus-within {
     border-color: var(--Dash-Fill-Interactive-Strong);
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-dropdown-search-icon,

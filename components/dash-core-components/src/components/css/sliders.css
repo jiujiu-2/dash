@@ -75,7 +75,7 @@
 }
 
 .dash-slider-thumb:focus {
-    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
+    outline: 2px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-slider-thumb:focus .dash-slider-tooltip,
@@ -226,7 +226,7 @@
 }
 
 .dash-range-slider-input:focus {
-    outline: none;
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 /* Hide the number input spinners */
