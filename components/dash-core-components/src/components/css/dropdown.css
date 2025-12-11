@@ -104,8 +104,11 @@
 
 .dash-dropdown-value-count {
     line-height: 18px;
-    padding: 0 2px;
+    padding: 4px;
+    border-radius: 4px;
+    color: var(--Dash-Text-Weak);
     background: var(--Dash-Fill-Weak);
+    font-size: 0.875em;
 }
 
 .dash-dropdown-search-container {
@@ -219,10 +222,13 @@
     box-shadow: 0 -1px 0 0 var(--Dash-Fill-Disabled) inset;
 }
 
-.dash-dropdown-option input[type='radio'] {
+.dash-dropdown-option
+    .dash-options-list-option-wrapper:has(input[type='radio']) {
+    /* radio buttons are used in single-select dropdowns to aid keyboard
+     * selection and screen readers, but visually, they are hidden
+     */
     width: 0;
-    margin: 0;
-    outline: none;
+    overflow: hidden;
 }
 
 /* Positioning container for the dropdown */
