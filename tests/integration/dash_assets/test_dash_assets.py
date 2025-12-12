@@ -131,6 +131,7 @@ def test_dada003_external_resources_with_attributes(dash_duo):
         {
             "external_url": "https://cdn.example.com/module-script.js",
             "attributes": {"type": "module"},
+            "external_only": True,
         }
     )
 
@@ -138,6 +139,7 @@ def test_dada003_external_resources_with_attributes(dash_duo):
         {
             "external_url": "https://cdn.example.com/async-script.js",
             "attributes": {"async": "true", "data-test": "custom"},
+            "external_only": True,
         }
     )
 
@@ -146,6 +148,7 @@ def test_dada003_external_resources_with_attributes(dash_duo):
         {
             "external_url": "https://cdn.example.com/print-styles.css",
             "attributes": {"media": "print"},
+            "external_only": True,
         }
     )
 

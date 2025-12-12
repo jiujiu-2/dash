@@ -126,7 +126,7 @@ def test_collect_and_register_resources(mocker):
 
 def test_resources_with_attributes():
     """Test that attributes are passed through in external_url resources"""
-    app = dash.Dash(__name__, serve_locally=False)
+    app = dash.Dash(__name__)
 
     # Test external scripts with attributes
     resources = app._collect_and_register_resources(
@@ -134,6 +134,7 @@ def test_resources_with_attributes():
             {
                 "external_url": "https://example.com/module.js",
                 "attributes": {"type": "module"},
+                "external_only": True,
             },
             {
                 "external_url": "https://example.com/script.js",
@@ -141,6 +142,7 @@ def test_resources_with_attributes():
                     "crossorigin": "anonymous",
                     "integrity": "sha256-abc123",
                 },
+                "external_only": True,
             },
         ]
     )
@@ -157,7 +159,7 @@ def test_resources_with_attributes():
 
 def test_css_resources_with_attributes():
     """Test that attributes are passed through in CSS resources with href"""
-    app = dash.Dash(__name__, serve_locally=False)
+    app = dash.Dash(__name__)
 
     # Test external CSS with attributes
     resources = app._collect_and_register_resources(
@@ -165,10 +167,12 @@ def test_css_resources_with_attributes():
             {
                 "external_url": "https://example.com/styles.css",
                 "attributes": {"media": "print"},
+                "external_only": True,
             },
             {
                 "external_url": "https://example.com/theme.css",
                 "attributes": {"crossorigin": "anonymous"},
+                "external_only": True,
             },
         ],
         url_attr="href",
@@ -182,11 +186,11 @@ def test_css_resources_with_attributes():
 
 def test_resources_without_attributes():
     """Test that resources without attributes still work as strings"""
-    app = dash.Dash(__name__, serve_locally=False)
+    app = dash.Dash(__name__)
 
     resources = app._collect_and_register_resources(
         [
-            {"external_url": "https://example.com/script.js"},
+            {"external_url": "https://example.com/script.js", "external_only": True},
         ]
     )
 
@@ -230,7 +234,7 @@ def test_local_resources_with_attributes(mocker):
 
 def test_multiple_external_urls_with_attributes():
     """Test that multiple external URLs with attributes work correctly"""
-    app = dash.Dash(__name__, serve_locally=False)
+    app = dash.Dash(__name__)
 
     resources = app._collect_and_register_resources(
         [
@@ -240,6 +244,7 @@ def test_multiple_external_urls_with_attributes():
                     "https://example.com/script2.js",
                 ],
                 "attributes": {"type": "module"},
+                "external_only": True,
             }
         ]
     )
