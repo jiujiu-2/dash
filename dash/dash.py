@@ -2515,6 +2515,7 @@ class Dash(ObsoleteChecker):
                     Output(_ID_STORE, "data"),
                     inputs=inputs,
                     prevent_initial_call=True,
+                    hidden=True,
                 )
                 async def update(pathname_, search_, **states):
                     """
@@ -2581,6 +2582,7 @@ class Dash(ObsoleteChecker):
                     Output(_ID_STORE, "data"),
                     inputs=inputs,
                     prevent_initial_call=True,
+                    hidden=True,
                 )
                 def update(pathname_, search_, **states):
                     """
