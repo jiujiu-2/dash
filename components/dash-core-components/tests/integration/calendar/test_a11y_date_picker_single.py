@@ -4,6 +4,7 @@ from dash.dcc import DatePickerSingle
 from dash.html import Div, Label, P
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from time import sleep
 
 
 def send_keys(driver, key):
@@ -34,8 +35,14 @@ def create_date_picker_app(date_picker_props):
 
 def open_calendar(dash_dcc, date_picker):
     """Open the calendar and wait for it to be visible"""
-    date_picker.click()
+
+    # The input element has the same ID as the date picker component itself
+    input_id = date_picker.get_attribute("id")
+    input_element = dash_dcc.find_element(f"#{input_id}")
+    input_element.send_keys(Keys.ARROW_DOWN)
     dash_dcc.wait_for_element(".dash-datepicker-calendar-container")
+    # Wait for focus to be applied via requestAnimationFrame
+    sleep(0.1)
 
 
 def close_calendar(dash_dcc, driver):

@@ -122,28 +122,16 @@ const DatePickerSingle = ({
         [reopen_calendar_on_clear]
     );
 
-    // Focus the selected date when calendar opens
-    useEffect(() => {
-        if (isCalendarOpen) {
-            requestAnimationFrame(() => {
-                if (internalDate) {
-                    calendarRef.current?.focusDate(internalDate);
-                }
-            });
-        }
-    }, [isCalendarOpen, internalDate]);
-
     const handleInputKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
+            if (['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
                 e.preventDefault();
-                parseUserInput(true);
                 if (!isCalendarOpen) {
-                    // open the calendar after resolving prop changes, so that
-                    // it opens with the correct date showing
-                    setTimeout(() => setIsCalendarOpen(true), 0);
+                    setIsCalendarOpen(true);
                 }
-            } else if (['Enter', 'Tab'].includes(e.key)) {
+                // Wait for calendar to mount before focusing
+                requestAnimationFrame(() => parseUserInput(true));
+            } else if (e.key === 'Tab') {
                 parseUserInput();
             }
         },

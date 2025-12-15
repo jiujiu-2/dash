@@ -99,6 +99,12 @@
     transition: transform 0.15s;
 }
 
+.dash-datepicker-range-arrow {
+    color: var(--Dash-Text-Strong);
+    width: 1em;
+    height: 1em;
+}
+
 .dash-datepicker-input-wrapper[aria-expanded='true']
     .dash-datepicker-caret-icon {
     transform: rotate(180deg);
