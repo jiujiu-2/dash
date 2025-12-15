@@ -11,6 +11,8 @@
     border: 1px solid var(--Dash-Fill-Interactive-Strong);
     box-sizing: border-box;
     vertical-align: middle;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 /* Hover state - stronger background */
@@ -28,15 +30,12 @@
 
 /* Keyboard focus - inverted colors */
 .dash-button:focus-visible {
-    outline: none;
-    background: var(--Dash-Fill-Interactive-Strong);
-    color: var(--Dash-Fill-Inverse-Strong);
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 /* Hover after keyboard focus - keep inverted but acknowledge hover */
 .dash-button:focus-visible:hover {
-    background: var(--Dash-Fill-Interactive-Strong);
-    color: var(--Dash-Fill-Inverse-Strong);
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 /* Active state after keyboard focus - inverted colors */

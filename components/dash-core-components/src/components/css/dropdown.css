@@ -8,6 +8,7 @@
     outline: none;
     width: 100%;
     cursor: pointer;
+    font-family: inherit;
     font-size: inherit;
     overflow: hidden;
     accent-color: var(--Dash-Fill-Interactive-Strong);
@@ -46,6 +47,7 @@
 
 .dash-dropdown:focus {
     border: 1px solid var(--Dash-Fill-Interactive-Strong);
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-dropdown:disabled {
@@ -102,8 +104,11 @@
 
 .dash-dropdown-value-count {
     line-height: 18px;
-    padding: 0 2px;
+    padding: 4px;
+    border-radius: 4px;
+    color: var(--Dash-Text-Weak);
     background: var(--Dash-Fill-Weak);
+    font-size: 0.875em;
 }
 
 .dash-dropdown-search-container {
@@ -118,12 +123,13 @@
 
 .dash-dropdown-search-container:focus-within {
     border-color: var(--Dash-Fill-Interactive-Strong);
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-dropdown-search-icon,
 .dash-dropdown-clear {
-    width: calc(var(--Dash-Spacing) * 3);
-    height: calc(var(--Dash-Spacing) * 3);
+    width: 1em;
+    height: 1em;
 }
 
 .dash-dropdown-search-container:focus-within .dash-dropdown-search-icon {
@@ -160,6 +166,8 @@
     color: var(--Dash-Text-Strong);
     outline: none;
     padding: 0;
+    font-family: inherit;
+    font-size: inherit;
 
     /* Hide the "x" clear button in search inputs */
     &::-webkit-search-cancel-button {
@@ -186,11 +194,12 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-family: inherit;
+    font-size: 0.875em;
     font-weight: 600;
     padding: 0;
     text-decoration: none;
-    color: var(--Dash-Text-Disabled);
+    color: var(--Dash-Text-Weak);
     white-space: nowrap;
     accent-color: var(--Dash-Fill-Interactive-Strong);
     outline-color: var(--Dash-Fill-Interactive-Strong);
@@ -211,6 +220,15 @@
 .dash-dropdown-option {
     padding: calc(var(--Dash-Spacing) * 2) calc(var(--Dash-Spacing) * 3);
     box-shadow: 0 -1px 0 0 var(--Dash-Fill-Disabled) inset;
+}
+
+.dash-dropdown-option
+    .dash-options-list-option-wrapper:has(input[type='radio']) {
+    /* radio buttons are used in single-select dropdowns to aid keyboard
+     * selection and screen readers, but visually, they are hidden
+     */
+    width: 0;
+    overflow: hidden;
 }
 
 /* Positioning container for the dropdown */

@@ -4,7 +4,7 @@
     color: var(--Dash-Text-Strong);
     cursor: pointer;
     display: flex;
-    align-items: center;
+    align-items: baseline;
     user-select: none;
 }
 
@@ -19,6 +19,7 @@
     cursor: not-allowed;
 }
 
+.dash-options-list-option-wrapper,
 .dash-options-list-option-text {
     display: flex;
     align-items: center;

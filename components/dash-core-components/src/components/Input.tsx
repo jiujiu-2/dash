@@ -253,7 +253,7 @@ function Input({
     }) as Pick<InputHTMLAttributes<HTMLInputElement>, HTMLInputProps>;
 
     const isNumberInput = type === HTMLInputTypes.number;
-    const currentNumericValue = convert(input.current.value || '0');
+    const currentNumericValue = parseFloat(String(value ?? 0)) || 0;
     const minValue = convert(props.min);
     const maxValue = convert(props.max);
     const isDecrementDisabled =

@@ -7,14 +7,14 @@
     touch-action: none;
     width: 100%;
     height: 14px;
-    padding: 18px 0 18px 0;
+    padding: 17px 0 17px 0;
     box-sizing: border-box;
     /* Override Radix's default margin/padding behavior */
     --radix-slider-thumb-width: 16px;
 }
 
 .dash-slider-root.has-marks {
-    padding: 8px 0 28px 0;
+    padding: 6px 0 28px 0;
 }
 
 .dash-slider-root[data-orientation='vertical'].has-marks {
@@ -75,7 +75,7 @@
 }
 
 .dash-slider-thumb:focus {
-    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
+    outline: 2px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-slider-thumb:focus .dash-slider-tooltip,
@@ -210,11 +210,19 @@
 
 .dash-range-slider-input {
     min-width: 5cqw; /* 5% of container width */
-    max-width: 15cqw; /* 15% of container width */
+    max-width: 25cqw; /* 25% of container width */
     text-align: center;
     -webkit-appearance: textfield;
     -moz-appearance: textfield;
     appearance: textfield;
+    font-family: inherit;
+    font-size: inherit;
+    box-sizing: content-box;
+    height: 30px;
+}
+
+.dash-range-slider-input:only-of-type {
+    max-width: 33cqw;
 }
 
 .dash-range-slider-input::selection,
@@ -224,7 +232,7 @@
 }
 
 .dash-range-slider-input:focus {
-    outline: none;
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 /* Hide the number input spinners */
