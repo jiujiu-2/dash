@@ -37,9 +37,6 @@ def open_calendar(dash_dcc, date_picker):
     date_picker.click()
     dash_dcc.wait_for_element(".dash-datepicker-calendar-container")
 
-    # Send focus onto the calendar
-    send_keys(dash_dcc.driver, Keys.ARROW_DOWN)
-
 
 def close_calendar(dash_dcc, driver):
     """Close the calendar with Escape and wait for it to disappear"""

@@ -240,6 +240,19 @@ const DatePickerRange = ({
         [reopen_calendar_on_clear]
     );
 
+    // Focus the selected date when calendar opens
+    useEffect(() => {
+        if (isCalendarOpen) {
+            requestAnimationFrame(() => {
+                // Focus start date if available, otherwise end date
+                const dateToFocus = internalStartDate || internalEndDate;
+                if (dateToFocus) {
+                    calendarRef.current?.focusDate(dateToFocus);
+                }
+            });
+        }
+    }, [isCalendarOpen, internalStartDate, internalEndDate]);
+
     const handleStartInputKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (['ArrowUp', 'ArrowDown'].includes(e.key)) {

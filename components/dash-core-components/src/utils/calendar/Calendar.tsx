@@ -292,18 +292,30 @@ const CalendarComponent = ({
                 >
                     <PreviousMonthIcon />
                 </button>
-                <Dropdown
-                    options={monthOptions}
-                    value={activeMonth}
-                    clearable={false}
-                    maxHeight={250}
-                    searchable={false}
-                    setProps={({value}) => {
-                        if (Number.isInteger(value)) {
-                            setActiveMonth(value as number);
-                        }
-                    }}
-                />
+                <div style={{display: 'grid'}}>
+                    {/* Render all the month names invisibly so that the longest month name is what determines the width of the month picker, regardless of which language is used */}
+                    {monthOptions.map((opt, i) => (
+                        <div
+                            key={i}
+                            className="dash-datepicker-month-sizer"
+                            aria-hidden="true"
+                        >
+                            {opt.label}
+                        </div>
+                    ))}
+                    <Dropdown
+                        options={monthOptions}
+                        value={activeMonth}
+                        clearable={false}
+                        maxHeight={250}
+                        searchable={false}
+                        setProps={({value}) => {
+                            if (Number.isInteger(value)) {
+                                setActiveMonth(value as number);
+                            }
+                        }}
+                    />
+                </div>
                 <Input
                     type={HTMLInputTypes.number}
                     debounce={0.5}

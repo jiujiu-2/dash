@@ -122,6 +122,17 @@ const DatePickerSingle = ({
         [reopen_calendar_on_clear]
     );
 
+    // Focus the selected date when calendar opens
+    useEffect(() => {
+        if (isCalendarOpen) {
+            requestAnimationFrame(() => {
+                if (internalDate) {
+                    calendarRef.current?.focusDate(internalDate);
+                }
+            });
+        }
+    }, [isCalendarOpen, internalDate]);
+
     const handleInputKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
