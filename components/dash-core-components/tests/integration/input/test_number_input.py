@@ -1,5 +1,6 @@
 import time
 import sys
+from dash import Dash, Input, Output, html, dcc
 from selenium.webdriver.common.keys import Keys
 
 
@@ -63,6 +64,86 @@ def test_inni003_invalid_numbers_range(dash_dcc, input_range_app):
 
     time.sleep(0.5)
     dash_dcc.percy_snapshot("inni003 - number out of range")
+
+    assert dash_dcc.get_logs() == []
+
+
+def test_inni004_steppers(dash_dcc, debounce_number_app):
+    dash_dcc.start_server(debounce_number_app)
+
+    # Test input with min=10, max=10000, step=3 (#input-fast)
+    input_elem = dash_dcc.find_element("#input-fast")
+    increment_btn = dash_dcc.find_element("#input-fast~.dash-stepper-increment")
+    decrement_btn = dash_dcc.find_element("#input-fast~.dash-stepper-decrement")
+
+    # Verify steppers exist
+    assert increment_btn.is_displayed(), "Increment stepper should be visible"
+    assert decrement_btn.is_displayed(), "Decrement stepper should be visible"
+
+    # Set initial value to 100
+    input_elem.send_keys("100")
+    dash_dcc.wait_for_text_to_equal("#div-fast", "100")
+
+    # Test increment stepper - should increase by step=3
+    increment_btn.click()
+    dash_dcc.wait_for_text_to_equal("#div-fast", "103")
+
+    # Test decrement stepper - should decrease by step=3
+    decrement_btn.click()
+    dash_dcc.wait_for_text_to_equal("#div-fast", "100")
+
+    # Test multiple increments
+    increment_btn.click()
+    increment_btn.click()
+    dash_dcc.wait_for_text_to_equal("#div-fast", "106")
+
+    # Test that steppers respect min constraint
+    dash_dcc.clear_input(input_elem)
+    input_elem.send_keys("11")  # Close to min=10
+    decrement_btn.click()  # Should go to 10 (min)
+    dash_dcc.wait_for_text_to_equal("#div-fast", "10")
+
+    # Verify decrement button is disabled at minimum
+    assert (
+        decrement_btn.get_attribute("disabled") == "true"
+    ), "Decrement should be disabled at minimum"
+
+    # Test that steppers respect max constraint
+    dash_dcc.clear_input(input_elem)
+    input_elem.send_keys("9999")  # Close to max=10000
+    increment_btn.click()  # Should go to 10000 (max)
+    dash_dcc.wait_for_text_to_equal("#div-fast", "10000")
+
+    # Verify increment button is disabled at maximum
+    assert (
+        increment_btn.get_attribute("disabled") == "true"
+    ), "Increment should be disabled at maximum"
+
+    assert dash_dcc.get_logs() == []
+
+
+def test_inni005_stepper_decrement_bug(dash_dcc, input_range_app):
+    """Test that decrement button works correctly with min/max constraints on initial render."""
+
+    app = Dash(__name__)
+    app.layout = html.Div(
+        [
+            dcc.Input(id="number", value=17, type="number", min=10, max=23),
+            html.Div(id="output"),
+        ]
+    )
+
+    @app.callback(Output("output", "children"), [Input("number", "value")])
+    def update_output(val):
+        return val
+
+    dash_dcc.start_server(app)
+
+    decrement_btn = dash_dcc.find_element(".dash-stepper-decrement")
+
+    # Initial value is 17, should be able to decrement to 16
+    decrement_btn.click()
+    dash_dcc.wait_for_text_to_equal("#output", "16")
 
     assert dash_dcc.get_logs() == []
 
