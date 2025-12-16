@@ -2,6 +2,7 @@ import functools
 import os
 import sys
 import collections
+import inspect
 import importlib
 import warnings
 from contextvars import copy_context
@@ -220,7 +221,7 @@ no_update = _callback.NoUpdate()  # pylint: disable=protected-access
 
 async def execute_async_function(func, *args, **kwargs):
     # Check if the function is a coroutine function
-    if asyncio.iscoroutinefunction(func):
+    if inspect.iscoroutinefunction(func):
         return await func(*args, **kwargs)
     # If the function is not a coroutine, call it directly
     return func(*args, **kwargs)
@@ -837,7 +838,7 @@ class Dash(ObsoleteChecker):
             return _parse_body_async
 
         for path, func in self.callback_api_paths.items():
-            if asyncio.iscoroutinefunction(func):
+            if inspect.iscoroutinefunction(func):
                 self._add_url(path, make_parse_body_async(func), ["POST"])
             else:
                 self._add_url(path, make_parse_body(func), ["POST"])
