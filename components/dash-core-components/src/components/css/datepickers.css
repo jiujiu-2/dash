@@ -99,6 +99,12 @@
     transition: transform 0.15s;
 }
 
+.dash-datepicker-range-arrow {
+    color: var(--Dash-Text-Strong);
+    width: 1em;
+    height: 1em;
+}
+
 .dash-datepicker-input-wrapper[aria-expanded='true']
     .dash-datepicker-caret-icon {
     transform: rotate(180deg);
@@ -162,15 +168,25 @@
 
 .dash-datepicker-controls .dash-dropdown {
     flex: 0 0 auto;
-    min-width: 122px;
-    width: auto;
     margin: 0;
+}
+
+.dash-datepicker-month-sizer {
+    height: 0;
+    grid-area: 1 / 1;
+    visibility: hidden;
+    pointer-events: none;
+    white-space: nowrap;
+    padding: 0 24px;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .dash-datepicker-controls .dash-input {
     flex-shrink: 0;
     flex-grow: 0;
-    width: 102px;
+    min-width: 102px;
+    width: calc(5ch + 40px);
 }
 
 .dash-datepicker-controls .dash-input-stepper {
