@@ -384,6 +384,9 @@ const DatePickerRange = ({
                         className="dash-datepicker-content"
                         align="start"
                         sideOffset={5}
+                        collisionBoundary={containerRef.current?.closest(
+                            '#_dash-app-content'
+                        )}
                         onOpenAutoFocus={e => e.preventDefault()}
                         onCloseAutoFocus={e => {
                             e.preventDefault();
