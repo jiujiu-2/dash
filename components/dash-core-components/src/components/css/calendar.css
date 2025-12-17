@@ -42,11 +42,7 @@
 }
 
 .dash-datepicker-calendar td.dash-datepicker-calendar-date-highlighted {
-    background-color: color-mix(
-        in srgb,
-        var(--Dash-Fill-Interactive-Strong) 5%,
-        transparent 95%
-    );
+    background-color: var(--Dash-Fill-Interactive-Weak);
     color: var(--Dash-Fill-Interactive-Strong);
 }
 
