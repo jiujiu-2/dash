@@ -16,9 +16,7 @@ def test_upfd001_folder_upload_with_enable_folder_selection(dash_dcc):
             html.Div("Folder Upload Test", id="title"),
             dcc.Upload(
                 id="upload-folder",
-                children=html.Div(
-                    ["Drag and Drop or ", html.A("Select Folder")]
-                ),
+                children=html.Div(["Drag and Drop or ", html.A("Select Folder")]),
                 style={
                     "width": "100%",
                     "height": "60px",
@@ -77,7 +75,9 @@ def test_upfd002_multiple_files_without_folder_selection(dash_dcc):
             html.Div("Multiple Files Test", id="title"),
             dcc.Upload(
                 id="upload-multiple",
-                children=html.Div(["Drag and Drop or ", html.A("Select Multiple Files")]),
+                children=html.Div(
+                    ["Drag and Drop or ", html.A("Select Multiple Files")]
+                ),
                 style={
                     "width": "100%",
                     "height": "60px",

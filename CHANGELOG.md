@@ -2,6 +2,14 @@
 All notable changes to `dash` will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [4.0.0rc5] - 2025-12-16
+
+## Added
+- New prop in `dcc.Upload` allows users to recursively upload entire folders at once
+
+## Changed
+- Bugfixes for feedback received in `rc4`
+
 ## [4.0.0rc4] - 2025-12-04
 
 ## Added

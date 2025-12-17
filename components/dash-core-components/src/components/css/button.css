@@ -1,10 +1,6 @@
 .dash-button {
     line-height: 32px;
-    background: color-mix(
-        in srgb,
-        var(--Dash-Fill-Interactive-Strong) 5%,
-        transparent
-    );
+    background: var(--Dash-Fill-Interactive-Weak);
     color: var(--Dash-Fill-Interactive-Strong);
     padding: 0 calc(var(--Dash-Spacing) * 2);
     border-radius: 4px;
