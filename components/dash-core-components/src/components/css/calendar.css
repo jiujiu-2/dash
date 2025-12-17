@@ -16,7 +16,6 @@
     font-weight: normal;
     color: var(--Dash-Text-Weak);
     text-align: center;
-    border-radius: 4px;
     cursor: default;
     user-select: none;
     -webkit-user-select: none;
@@ -37,6 +36,7 @@
 .dash-datepicker-calendar td:focus {
     outline: 2px solid var(--Dash-Fill-Interactive-Strong);
     outline-offset: -2px;
+    border-radius: 4px;
     z-index: 1;
     position: relative;
 }
@@ -53,6 +53,28 @@
 .dash-datepicker-calendar td.dash-datepicker-calendar-date-selected {
     background-color: var(--Dash-Fill-Interactive-Strong);
     color: var(--Dash-Fill-Inverse-Strong);
+}
+
+.dash-datepicker-calendar td.dash-datepicker-calendar-date-selected {
+    background-color: var(--Dash-Fill-Interactive-Strong);
+    color: var(--Dash-Fill-Inverse-Strong);
+}
+
+/* start_date selector: a selected date which is preceded by an unselected date */
+.dash-datepicker-calendar
+    td:not(.dash-datepicker-calendar-date-highlighted)
+    + td.dash-datepicker-calendar-date-selected {
+    border-start-start-radius: 4px;
+    border-end-start-radius: 4px;
+}
+
+/* end_date selector: a selected date which is followed by an unselected date */
+.dash-datepicker-calendar
+    td.dash-datepicker-calendar-date-selected:not(
+        :has(+ td.dash-datepicker-calendar-date-highlighted)
+    ) {
+    border-start-end-radius: 4px;
+    border-end-end-radius: 4px;
 }
 
 .dash-datepicker-calendar td.dash-datepicker-calendar-date-disabled {

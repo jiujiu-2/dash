@@ -3,7 +3,6 @@ import * as Popover from '@radix-ui/react-popover';
 import {
     ArrowLeftIcon,
     ArrowRightIcon,
-    CalendarIcon,
     CaretDownIcon,
     Cross1Icon,
 } from '@radix-ui/react-icons';
@@ -136,6 +135,12 @@ const DatePickerRange = ({
                 start_date: dateAsStr(internalStartDate),
                 end_date: dateAsStr(internalEndDate),
             });
+        } else if (!internalStartDate && !internalEndDate) {
+            // Both dates cleared - send undefined for both
+            setProps({
+                start_date: dateAsStr(internalStartDate),
+                end_date: dateAsStr(internalEndDate),
+            });
         } else if (updatemode === 'singledate' && internalStartDate) {
             // Only start changed - send just that one
             setProps({start_date: dateAsStr(internalStartDate)});
@@ -145,17 +150,23 @@ const DatePickerRange = ({
         }
     }, [internalStartDate, internalEndDate, updatemode]);
 
+    const isDateAllowed = useCallback(
+        (date?: Date): date is Date => {
+            return (
+                !!date && !isDateDisabled(date, minDate, maxDate, disabledDates)
+            );
+        },
+        [minDate, maxDate, disabledDates]
+    );
+
     const sendStartInputAsDate = useCallback(
         (focusCalendar = false) => {
             if (startInputValue) {
                 setInternalStartDate(undefined);
             }
             const parsed = strAsDate(startInputValue, display_format);
-            const isValid =
-                parsed &&
-                !isDateDisabled(parsed, minDate, maxDate, disabledDates);
 
-            if (isValid) {
+            if (isDateAllowed(parsed)) {
                 setInternalStartDate(parsed);
                 if (focusCalendar) {
                     calendarRef.current?.focusDate(parsed);
@@ -173,14 +184,7 @@ const DatePickerRange = ({
                 }
             }
         },
-        [
-            startInputValue,
-            display_format,
-            start_date,
-            minDate,
-            maxDate,
-            disabledDates,
-        ]
+        [startInputValue, display_format, start_date, isDateAllowed]
     );
 
     const sendEndInputAsDate = useCallback(
@@ -189,11 +193,8 @@ const DatePickerRange = ({
                 setInternalEndDate(undefined);
             }
             const parsed = strAsDate(endInputValue, display_format);
-            const isValid =
-                parsed &&
-                !isDateDisabled(parsed, minDate, maxDate, disabledDates);
 
-            if (isValid) {
+            if (isDateAllowed(parsed)) {
                 setInternalEndDate(parsed);
                 if (focusCalendar) {
                     calendarRef.current?.focusDate(parsed);
@@ -211,14 +212,7 @@ const DatePickerRange = ({
                 }
             }
         },
-        [
-            endInputValue,
-            display_format,
-            end_date,
-            minDate,
-            maxDate,
-            disabledDates,
-        ]
+        [endInputValue, display_format, end_date, isDateAllowed]
     );
 
     const clearSelection = useCallback(
@@ -237,15 +231,14 @@ const DatePickerRange = ({
 
     const handleStartInputKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
+            if (['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
                 e.preventDefault();
-                sendStartInputAsDate(true);
                 if (!isCalendarOpen) {
-                    // open the calendar after resolving prop changes, so that
-                    // it opens with the correct date showing
-                    setTimeout(() => setIsCalendarOpen(true), 0);
+                    setIsCalendarOpen(true);
                 }
-            } else if (['Enter', 'Tab'].includes(e.key)) {
+                // Wait for calendar to mount before focusing
+                requestAnimationFrame(() => sendStartInputAsDate(true));
+            } else if (e.key === 'Tab') {
                 sendStartInputAsDate();
             }
         },
@@ -254,15 +247,14 @@ const DatePickerRange = ({
 
     const handleEndInputKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
+            if (['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
                 e.preventDefault();
-                sendEndInputAsDate(true);
                 if (!isCalendarOpen) {
-                    // open the calendar after resolving prop changes, so that
-                    // it opens with the correct date showing
-                    setTimeout(() => setIsCalendarOpen(true), 0);
+                    setIsCalendarOpen(true);
                 }
-            } else if (['Enter', 'Tab'].includes(e.key)) {
+                // Wait for calendar to mount before focusing
+                requestAnimationFrame(() => sendEndInputAsDate(true));
+            } else if (e.key === 'Tab') {
                 sendEndInputAsDate();
             }
         },
@@ -333,7 +325,6 @@ const DatePickerRange = ({
                             }
                         }}
                     >
-                        <CalendarIcon className="dash-datepicker-trigger-icon" />
                         <AutosizeInput
                             inputRef={node => {
                                 startInputRef.current = node;
@@ -345,10 +336,8 @@ const DatePickerRange = ({
                             onChange={e => setStartInputValue(e.target.value)}
                             onKeyDown={handleStartInputKeyDown}
                             onFocus={() => {
-                                if (internalStartDate) {
-                                    calendarRef.current?.setVisibleDate(
-                                        internalStartDate
-                                    );
+                                if (isCalendarOpen) {
+                                    sendStartInputAsDate();
                                 }
                             }}
                             placeholder={start_date_placeholder_text}
@@ -356,7 +345,7 @@ const DatePickerRange = ({
                             dir={direction}
                             aria-label={start_date_placeholder_text}
                         />
-                        <ArrowIcon />
+                        <ArrowIcon className="dash-datepicker-range-arrow" />
                         <AutosizeInput
                             inputRef={node => {
                                 endInputRef.current = node;
@@ -368,10 +357,8 @@ const DatePickerRange = ({
                             onChange={e => setEndInputValue(e.target.value)}
                             onKeyDown={handleEndInputKeyDown}
                             onFocus={() => {
-                                if (internalEndDate) {
-                                    calendarRef.current?.setVisibleDate(
-                                        internalEndDate
-                                    );
+                                if (isCalendarOpen) {
+                                    sendEndInputAsDate();
                                 }
                             }}
                             placeholder={end_date_placeholder_text}

@@ -47,6 +47,7 @@ const Dropdown = (props: DropdownProps) => {
     const dropdownContentRef = useRef<HTMLDivElement>(
         document.createElement('div')
     );
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     const ctx = window.dash_component_api.useDashContext();
     const loading = ctx.useLoading();
@@ -234,25 +235,36 @@ const Dropdown = (props: DropdownProps) => {
         }
     }, [filteredOptions, isOpen]);
 
-    // Focus (and scroll) the first selected item when dropdown opens
+    // Focus first selected item or search input when dropdown opens
     useEffect(() => {
-        if (!isOpen || multi || search_value) {
+        if (!isOpen || search_value) {
             return;
         }
 
         // waiting for the DOM to be ready after the dropdown renders
         requestAnimationFrame(() => {
-            const selectedValue = sanitizedValues[0];
+            // Try to focus the first selected item (for single-select)
+            if (!multi) {
+                const selectedValue = sanitizedValues[0];
+                if (selectedValue) {
+                    const selectedElement =
+                        dropdownContentRef.current.querySelector(
+                            `.dash-options-list-option-checkbox[value="${selectedValue}"]`
+                        );
 
-            const selectedElement = dropdownContentRef.current.querySelector(
-                `.dash-options-list-option-checkbox[value="${selectedValue}"]`
-            );
+                    if (selectedElement instanceof HTMLElement) {
+                        selectedElement.focus();
+                        return;
+                    }
+                }
+            }
 
-            if (selectedElement instanceof HTMLElement) {
-                selectedElement?.focus();
+            // Fallback: focus search input if available and no selected item was focused
+            if (searchable && searchInputRef.current) {
+                searchInputRef.current.focus();
             }
         });
-    }, [isOpen, multi, displayOptions, sanitizedValues]);
+    }, [isOpen, multi, displayOptions]);
 
     // Handle keyboard navigation in popover
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -271,13 +283,13 @@ const Dropdown = (props: DropdownProps) => {
         // Don't interfere with the event if the user is using Home/End keys on the search input
         if (
             ['Home', 'End'].includes(e.key) &&
-            document.activeElement instanceof HTMLInputElement
+            document.activeElement === searchInputRef.current
         ) {
             return;
         }
 
         const focusableElements = e.currentTarget.querySelectorAll(
-            'input[type="search"], input[type="checkbox"]:not([disabled])'
+            'input[type="search"], input:not([disabled])'
         ) as NodeListOf<HTMLElement>;
 
         // Don't interfere with the event if there aren't any options that the user can interact with
@@ -335,7 +347,7 @@ const Dropdown = (props: DropdownProps) => {
             } else {
                 focusableElements[nextIndex].scrollIntoView({
                     behavior: 'auto',
-                    block: 'center',
+                    block: 'nearest',
                 });
             }
         }
@@ -354,8 +366,10 @@ const Dropdown = (props: DropdownProps) => {
     );
 
     const accessibleId = id ?? uuid();
+    const positioningContainerRef = useRef<HTMLDivElement>(null);
+    const canClearValues = clearable && !disabled && !!sanitizedValues.length;
 
-    return (
+    const popover = (
         <Popover.Root open={isOpen} onOpenChange={handleOpenChange}>
             <Popover.Trigger asChild>
                 <button
@@ -364,8 +378,19 @@ const Dropdown = (props: DropdownProps) => {
                     disabled={disabled}
                     type="button"
                     onKeyDown={e => {
-                        if (e.key === 'ArrowDown') {
+                        if (['ArrowDown', 'Enter'].includes(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
+                    onKeyUp={e => {
+                        if (['ArrowDown', 'Enter'].includes(e.key)) {
                             setIsOpen(true);
+                        }
+                        if (
+                            ['Delete', 'Backspace'].includes(e.key) &&
+                            canClearValues
+                        ) {
+                            handleClear();
                         }
                     }}
                     className={`dash-dropdown ${className ?? ''}`}
@@ -403,7 +428,7 @@ const Dropdown = (props: DropdownProps) => {
                                 )}
                             </span>
                         )}
-                        {clearable && !disabled && !!sanitizedValues.length && (
+                        {canClearValues && (
                             <a
                                 className="dash-dropdown-clear"
                                 onClick={e => {
@@ -426,7 +451,7 @@ const Dropdown = (props: DropdownProps) => {
                 // container is required otherwise popover will be rendered
                 // at document root, which may be outside of the Dash app (i.e.
                 // an embedded app)
-                container={dropdownContainerRef.current?.parentElement}
+                container={positioningContainerRef.current}
             >
                 <Popover.Content
                     ref={dropdownContentRef}
@@ -451,7 +476,7 @@ const Dropdown = (props: DropdownProps) => {
                                 value={search_value || ''}
                                 autoComplete="off"
                                 onChange={e => onInputChange(e.target.value)}
-                                autoFocus
+                                ref={searchInputRef}
                             />
                             {search_value && (
                                 <button
@@ -491,6 +516,7 @@ const Dropdown = (props: DropdownProps) => {
                                 options={displayOptions}
                                 selected={sanitizedValues}
                                 onSelectionChange={updateSelection}
+                                inputType={multi ? 'checkbox' : 'radio'}
                                 className="dash-dropdown-options"
                                 optionClassName="dash-dropdown-option"
                                 optionStyle={{
@@ -511,6 +537,12 @@ const Dropdown = (props: DropdownProps) => {
                 </Popover.Content>
             </Popover.Portal>
         </Popover.Root>
+    );
+
+    return (
+        <div ref={positioningContainerRef} className="dash-dropdown-wrapper">
+            {popover}
+        </div>
     );
 };
 

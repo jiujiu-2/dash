@@ -1,5 +1,5 @@
 import pytest
-from dash import Dash
+from dash import Dash, Input, Output
 from dash.dcc import Dropdown
 from dash.html import Div, Label, P
 from selenium.common.exceptions import TimeoutException
@@ -83,7 +83,7 @@ def test_a11y003_keyboard_navigation(dash_duo):
     dash_duo.start_server(app)
 
     dropdown = dash_duo.find_element("#dropdown")
-    dropdown.click()
+    dropdown.send_keys(Keys.ENTER)  # Open with Enter key
     dash_duo.wait_for_element(".dash-dropdown-options")
 
     send_keys(
@@ -198,6 +198,218 @@ def test_a11y005_selection_visibility_multi(dash_duo):
     assert elements_are_visible(
         dash_duo, selected_options
     ), "Selected options should be visible when the dropdown opens"
+
+    assert dash_duo.get_logs() == []
+
+
+def test_a11y006_multi_select_keyboard_focus_retention(dash_duo):
+    def send_keys(key):
+        actions = ActionChains(dash_duo.driver)
+        actions.send_keys(key)
+        actions.perform()
+
+    app = Dash(__name__)
+    app.layout = Div(
+        [
+            Dropdown(
+                id="dropdown",
+                options=[f"Option {i}" for i in range(0, 10)],
+                value=[],
+                multi=True,
+                searchable=True,
+            ),
+            Div(id="output"),
+        ]
+    )
+
+    @app.callback(
+        Output("output", "children"),
+        Input("dropdown", "value"),
+    )
+    def update_output(value):
+        return f"Selected: {value}"
+
+    dash_duo.start_server(app)
+
+    dropdown = dash_duo.find_element("#dropdown")
+    dropdown.click()
+    dash_duo.wait_for_element(".dash-dropdown-options")
+
+    # Select 3 items by alternating ArrowDown and Spacebar
+    send_keys(Keys.ARROW_DOWN)  # Move to first option
+    sleep(0.05)
+    send_keys(Keys.SPACE)  # Select Option 0
+    dash_duo.wait_for_text_to_equal("#output", "Selected: ['Option 0']")
+
+    send_keys(Keys.ARROW_DOWN)  # Move to second option
+    sleep(0.05)
+    send_keys(Keys.SPACE)  # Select Option 1
+    dash_duo.wait_for_text_to_equal("#output", "Selected: ['Option 0', 'Option 1']")
+
+    send_keys(Keys.ARROW_DOWN)  # Move to third option
+    sleep(0.05)
+    send_keys(Keys.SPACE)  # Select Option 2
+    dash_duo.wait_for_text_to_equal(
+        "#output", "Selected: ['Option 0', 'Option 1', 'Option 2']"
+    )
+
+    assert dash_duo.get_logs() == []
+
+
+def test_a11y007_opens_and_closes_without_races(dash_duo):
+    def send_keys(key):
+        actions = ActionChains(dash_duo.driver)
+        actions.send_keys(key)
+        actions.perform()
+
+    app = Dash(__name__)
+    app.layout = Div(
+        [
+            Dropdown(
+                id="dropdown",
+                options=[f"Option {i}" for i in range(0, 10)],
+                value="Option 5",
+                multi=False,
+            ),
+            Div(id="output"),
+        ]
+    )
+
+    def assert_focus_in_dropdown():
+        # Verify focus is inside the dropdown
+        assert dash_duo.driver.execute_script(
+            """
+            const activeElement = document.activeElement;
+            const dropdownContent = document.querySelector('.dash-dropdown-content');
+            return dropdownContent && dropdownContent.contains(activeElement);
+            """
+        ), "Focus must be inside the dropdown when it opens"
+
+    @app.callback(
+        Output("output", "children"),
+        Input("dropdown", "value"),
+    )
+    def update_output(value):
+        return f"Selected: {value}"
+
+    dash_duo.start_server(app)
+
+    # Verify initial value is set
+    dash_duo.wait_for_text_to_equal("#output", "Selected: Option 5")
+
+    dropdown = dash_duo.find_element("#dropdown")
+
+    # Test repeated open/close to confirm no race conditions or side effects
+    for i in range(3):
+        # Open with Enter
+        dropdown.send_keys(Keys.ENTER)
+        dash_duo.wait_for_element(".dash-dropdown-options")
+        assert_focus_in_dropdown()
+
+        # Verify the value is still "Option 5" (not cleared)
+        dash_duo.wait_for_text_to_equal("#output", "Selected: Option 5")
+
+        # Close with Escape
+        send_keys(Keys.ESCAPE)
+        sleep(0.1)
+
+        # Verify the value is still "Option 5"
+        dash_duo.wait_for_text_to_equal("#output", "Selected: Option 5")
+
+    for i in range(3):
+        # Open with mouse
+        dropdown.click()
+        dash_duo.wait_for_element(".dash-dropdown-options")
+        assert_focus_in_dropdown()
+
+        # Verify the value is still "Option 5" (not cleared)
+        dash_duo.wait_for_text_to_equal("#output", "Selected: Option 5")
+
+        # Close with Escape
+        dropdown.click()
+        sleep(0.1)
+
+        # Verify the value is still "Option 5"
+        dash_duo.wait_for_text_to_equal("#output", "Selected: Option 5")
+
+    assert dash_duo.get_logs() == []
+
+
+def test_a11y008_home_end_pageup_pagedown_navigation(dash_duo):
+    def send_keys(key):
+        actions = ActionChains(dash_duo.driver)
+        actions.send_keys(key)
+        actions.perform()
+
+    def get_focused_option_text():
+        return dash_duo.driver.execute_script(
+            """
+            const focused = document.activeElement;
+            if (focused && focused.closest('.dash-options-list-option')) {
+                return focused.closest('.dash-options-list-option').textContent.trim();
+            }
+            return null;
+            """
+        )
+
+    app = Dash(__name__)
+    app.layout = Div(
+        [
+            Dropdown(
+                id="dropdown",
+                options=[f"Option {i}" for i in range(0, 50)],
+                multi=True,
+            ),
+        ]
+    )
+
+    dash_duo.start_server(app)
+
+    dropdown = dash_duo.find_element("#dropdown")
+    dropdown.send_keys(Keys.ENTER)  # Open with Enter key
+    dash_duo.wait_for_element(".dash-dropdown-options")
+
+    # Navigate from search input to options
+    send_keys(Keys.ARROW_DOWN)  # Move from search to first option
+    sleep(0.05)
+    send_keys(Keys.ARROW_DOWN)  # Move to second option
+    sleep(0.05)
+    send_keys(Keys.ARROW_DOWN)  # Move to third option
+    sleep(0.05)
+    send_keys(Keys.ARROW_DOWN)  # Move to fourth option
+    sleep(0.05)
+    assert get_focused_option_text() == "Option 3"
+
+    send_keys(Keys.HOME)  # Should go back to search input (index 0)
+    # Verify we're back at search input
+    assert dash_duo.driver.execute_script(
+        "return document.activeElement.type === 'search';"
+    )
+
+    # Now arrow down to first option
+    send_keys(Keys.ARROW_DOWN)
+    assert get_focused_option_text() == "Option 0"
+
+    # Test End key - should go to last option
+    send_keys(Keys.END)
+    assert get_focused_option_text() == "Option 49"
+
+    # Test PageUp - should jump up by 10
+    send_keys(Keys.PAGE_UP)
+    assert get_focused_option_text() == "Option 39"
+
+    # Test PageDown - should jump down by 10
+    send_keys(Keys.PAGE_DOWN)
+    assert get_focused_option_text() == "Option 49"
+
+    # Test PageUp from middle
+    send_keys(Keys.HOME)  # Back to search input (index 0)
+    send_keys(Keys.PAGE_DOWN)  # Jump to index 10 (Option 9)
+    send_keys(Keys.PAGE_DOWN)  # Jump to index 20 (Option 19)
+    assert get_focused_option_text() == "Option 19"
+
+    send_keys(Keys.PAGE_UP)  # Jump to index 10 (Option 9)
+    assert get_focused_option_text() == "Option 9"
 
     assert dash_duo.get_logs() == []
 

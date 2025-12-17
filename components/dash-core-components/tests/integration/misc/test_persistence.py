@@ -118,6 +118,7 @@ def test_msps001_basic_persistence(dash_dcc):
     ]
 
     dash_dcc.start_server(app)
+    dash_dcc.driver.set_window_size(1024, 768)
     dash_dcc.wait_for_text_to_equal("#settings", json.dumps(initial_settings))
 
     dash_dcc.find_element("#checklist label:last-child input").click()  # 🚀

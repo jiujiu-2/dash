@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import * as Popover from '@radix-ui/react-popover';
-import {CalendarIcon, CaretDownIcon, Cross1Icon} from '@radix-ui/react-icons';
+import {CaretDownIcon, Cross1Icon} from '@radix-ui/react-icons';
 import AutosizeInput from 'react-input-autosize';
 import uuid from 'uniqid';
 
@@ -124,15 +124,14 @@ const DatePickerSingle = ({
 
     const handleInputKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
+            if (['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
                 e.preventDefault();
-                parseUserInput(true);
                 if (!isCalendarOpen) {
-                    // open the calendar after resolving prop changes, so that
-                    // it opens with the correct date showing
-                    setTimeout(() => setIsCalendarOpen(true), 0);
+                    setIsCalendarOpen(true);
                 }
-            } else if (['Enter', 'Tab'].includes(e.key)) {
+                // Wait for calendar to mount before focusing
+                requestAnimationFrame(() => parseUserInput(true));
+            } else if (e.key === 'Tab') {
                 parseUserInput();
             }
         },
@@ -170,7 +169,6 @@ const DatePickerSingle = ({
                             }
                         }}
                     >
-                        <CalendarIcon className="dash-datepicker-trigger-icon" />
                         <AutosizeInput
                             inputRef={node => {
                                 inputRef.current = node;

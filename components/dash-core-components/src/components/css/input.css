@@ -3,7 +3,7 @@
     position: relative;
     display: inline-flex;
     align-items: center;
-    width: 170px; /* default input width */
+    width: 100%;
     height: 34px;
     background: var(--Dash-Fill-Inverse-Strong);
     border-radius: var(--Dash-Spacing);
@@ -17,6 +17,10 @@
 
 .dash-input-container:focus-within {
     border: 1px solid var(--Dash-Fill-Interactive-Strong);
+}
+
+.dash-input-container:has(:focus-visible) {
+    outline: 1px solid var(--Dash-Fill-Interactive-Strong);
 }
 
 .dash-input-container:has(.dash-input-element:disabled) {
@@ -46,6 +50,8 @@
     z-index: 1;
     order: 2;
     accent-color: var(--Dash-Fill-Interactive-Strong);
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .dash-input-element::selection,
@@ -139,5 +145,5 @@
 }
 
 input.dash-input-element:invalid {
-    outline: solid red;
+    color: red;
 }

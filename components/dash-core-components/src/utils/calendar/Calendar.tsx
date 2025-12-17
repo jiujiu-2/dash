@@ -7,16 +7,16 @@ import React, {
     useState,
     forwardRef,
 } from 'react';
-import {addMonths, subMonths} from 'date-fns';
+import {addMonths, subMonths, endOfMonth} from 'date-fns';
 import {
     ArrowUpIcon,
     ArrowDownIcon,
     ArrowLeftIcon,
     ArrowRightIcon,
 } from '@radix-ui/react-icons';
-import Input, {HTMLInputTypes} from '../../components/Input';
+import Input from '../../components/Input';
 import Dropdown from '../../components/Dropdown';
-import {DayOfWeek, CalendarDirection} from '../../types';
+import {DayOfWeek, CalendarDirection, HTMLInputTypes} from '../../types';
 import {CalendarMonth} from './CalendarMonth';
 import {
     getMonthOptions,
@@ -80,6 +80,12 @@ const CalendarComponent = ({
         initialVisibleDate.getMonth()
     );
 
+    const [firstCalendarMonth, setFirstCalendarMonth] = useState(() => {
+        // Start by displaying calendar months centered around the initial date
+        const halfRange = Math.floor((numberOfMonthsShown - 1) / 2);
+        return subMonths(initialVisibleDate, halfRange);
+    });
+
     const [focusedDate, setFocusedDate] = useState<Date>();
     const [highlightedDates, setHighlightedDates] = useState<[Date, Date]>();
     const calendarContainerRef = useRef(document.createElement('div'));
@@ -101,6 +107,33 @@ const CalendarComponent = ({
         },
     }));
 
+    const isMonthVisible = useCallback(
+        (date: Date) => {
+            const visibleStart = firstCalendarMonth;
+            const visibleEnd = endOfMonth(
+                addMonths(visibleStart, numberOfMonthsShown - 1)
+            );
+            return isDateInRange(date, visibleStart, visibleEnd);
+        },
+        [firstCalendarMonth, numberOfMonthsShown]
+    );
+
+    // Updates the calendar whenever the active month & year change
+    useEffect(() => {
+        const activeDate = new Date(activeYear, activeMonth, 1);
+
+        // Don't change calendar if the active month is already visible
+        if (isMonthVisible(activeDate)) {
+            return;
+        }
+
+        setFirstCalendarMonth(
+            activeDate < firstCalendarMonth
+                ? activeDate // Moved backward: show activeDate as first month
+                : subMonths(activeDate, numberOfMonthsShown - 1) // Moved forward: show activeDate as last month
+        );
+    }, [activeMonth, activeYear, isMonthVisible]);
+
     useEffect(() => {
         // Syncs activeMonth/activeYear to focusedDate when focusedDate changes
         if (!focusedDate) {
@@ -111,21 +144,11 @@ const CalendarComponent = ({
         }
         prevFocusedDateRef.current = focusedDate;
 
-        const halfRange = Math.floor((numberOfMonthsShown - 1) / 2);
-        const activeMonthStart = new Date(activeYear, activeMonth, 1);
-        const visibleStart = subMonths(activeMonthStart, halfRange);
-        const visibleEnd = addMonths(activeMonthStart, halfRange);
-
-        const focusedMonthStart = new Date(
-            focusedDate.getFullYear(),
-            focusedDate.getMonth(),
-            1
-        );
-        if (!isDateInRange(focusedMonthStart, visibleStart, visibleEnd)) {
+        if (!isMonthVisible(focusedDate)) {
             setActiveMonth(focusedDate.getMonth());
             setActiveYear(focusedDate.getFullYear());
         }
-    }, [focusedDate, activeMonth, activeYear, numberOfMonthsShown]);
+    }, [focusedDate, isMonthVisible]);
 
     useEffect(() => {
         if (highlightStart && highlightEnd) {
@@ -225,6 +248,7 @@ const CalendarComponent = ({
             if (isDateInRange(newMonthStart, minDateAllowed, maxDateAllowed)) {
                 setActiveYear(newMonthStart.getFullYear());
                 setActiveMonth(newMonthStart.getMonth());
+                setFirstCalendarMonth(newMonthStart);
             }
         },
         [activeYear, activeMonth, minDateAllowed, maxDateAllowed, direction]
@@ -292,18 +316,30 @@ const CalendarComponent = ({
                 >
                     <PreviousMonthIcon />
                 </button>
-                <Dropdown
-                    options={monthOptions}
-                    value={activeMonth}
-                    clearable={false}
-                    maxHeight={250}
-                    searchable={false}
-                    setProps={({value}) => {
-                        if (Number.isInteger(value)) {
-                            setActiveMonth(value as number);
-                        }
-                    }}
-                />
+                <div style={{display: 'grid'}}>
+                    {/* Render all the month names invisibly so that the longest month name is what determines the width of the month picker, regardless of which language is used */}
+                    {monthOptions.map((opt, i) => (
+                        <div
+                            key={i}
+                            className="dash-datepicker-month-sizer"
+                            aria-hidden="true"
+                        >
+                            {opt.label}
+                        </div>
+                    ))}
+                    <Dropdown
+                        options={monthOptions}
+                        value={activeMonth}
+                        clearable={false}
+                        maxHeight={250}
+                        searchable={false}
+                        setProps={({value}) => {
+                            if (Number.isInteger(value)) {
+                                setActiveMonth(value as number);
+                            }
+                        }}
+                    />
+                </div>
                 <Input
                     type={HTMLInputTypes.number}
                     debounce={0.5}
@@ -337,13 +373,7 @@ const CalendarComponent = ({
                 }}
             >
                 {Array.from({length: numberOfMonthsShown}, (_, i) => {
-                    // Center the view: start from (numberOfMonthsShown - 1) / 2 months before activeMonth
-                    const offset =
-                        i - Math.floor((numberOfMonthsShown - 1) / 2);
-                    const monthDate = addMonths(
-                        new Date(activeYear, activeMonth, 1),
-                        offset
-                    );
+                    const monthDate = addMonths(firstCalendarMonth, i);
                     return (
                         <CalendarMonth
                             key={i}

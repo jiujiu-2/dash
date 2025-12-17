@@ -105,7 +105,7 @@ export const Option: React.FC<OptionProps> = ({
                     disabled={!!option.disabled}
                     onChange={() => onChange(option)}
                     onKeyUp={e => {
-                        if (e.key === 'Enter' && inputType === 'checkbox') {
+                        if (e.key === 'Enter') {
                             onChange(option);
                         }
                     }}

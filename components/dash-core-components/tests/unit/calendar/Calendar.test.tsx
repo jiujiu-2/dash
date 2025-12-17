@@ -1,16 +1,14 @@
 import React from 'react';
 import {render, waitFor, act} from '@testing-library/react';
-import Calendar from '../../../src/utils/calendar/Calendar';
+import Calendar, {CalendarHandle} from '../../../src/utils/calendar/Calendar';
 import {CalendarDirection} from '../../../src/types';
 
 // Mock LoadingElement to avoid Dash context issues in tests
 jest.mock('../../../src/utils/_LoadingElement', () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const React = require('react');
     return function LoadingElement({
         children,
     }: {
-        children: (props: any) => React.ReactNode;
+        children: (props: unknown) => React.ReactNode;
     }) {
         return children({});
     };
@@ -227,7 +225,7 @@ describe('Calendar', () => {
     ])(
         'focuses $description',
         ({visibleMonth, selectedDate, expectedFocusedDay}) => {
-            const ref = React.createRef<any>();
+            const ref = React.createRef<CalendarHandle>();
             render(
                 <Calendar
                     ref={ref}
