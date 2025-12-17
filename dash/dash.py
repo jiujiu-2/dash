@@ -1015,7 +1015,10 @@ class Dash(ObsoleteChecker):
                 dists.append(dict(type=dist_type, url=src))
         return dists
 
-    def _collect_and_register_resources(self, resources, include_async=True):
+    # pylint: disable=too-many-branches
+    def _collect_and_register_resources(
+        self, resources, include_async=True, url_attr="src"
+    ):
         # now needs the app context.
         # template in the necessary component suite JS bundles
         # add the version number of the package as a query parameter
@@ -1059,35 +1062,44 @@ class Dash(ObsoleteChecker):
                     self.registered_paths[resource["namespace"]].add(rel_path)
 
                     if not is_dynamic_resource and not excluded:
-                        srcs.append(
-                            _relative_url_path(
-                                relative_package_path=rel_path,
-                                namespace=resource["namespace"],
-                            )
+                        url = _relative_url_path(
+                            relative_package_path=rel_path,
+                            namespace=resource["namespace"],
                         )
+                        if "attributes" in resource:
+                            srcs.append({url_attr: url, **resource["attributes"]})
+                        else:
+                            srcs.append(url)
             elif "external_url" in resource:
                 if not is_dynamic_resource and not excluded:
-                    if isinstance(resource["external_url"], str):
-                        srcs.append(resource["external_url"])
-                    else:
-                        srcs += resource["external_url"]
+                    urls = (
+                        [resource["external_url"]]
+                        if isinstance(resource["external_url"], str)
+                        else resource["external_url"]
+                    )
+                    for url in urls:
+                        if "attributes" in resource:
+                            srcs.append({url_attr: url, **resource["attributes"]})
+                        else:
+                            srcs.append(url)
             elif "absolute_path" in resource:
                 raise Exception("Serving files from absolute_path isn't supported yet")
             elif "asset_path" in resource:
                 static_url = self.get_asset_url(resource["asset_path"])
+                url_with_cache = static_url + f"?m={resource['ts']}"
                 # Import .mjs files with type=module script tag
                 if static_url.endswith(".mjs"):
-                    srcs.append(
-                        {
-                            "src": static_url
-                            + f"?m={resource['ts']}",  # Add a cache-busting query param
-                            "type": "module",
-                        }
-                    )
+                    attrs = {url_attr: url_with_cache, "type": "module"}
+                    if "attributes" in resource:
+                        attrs.update(resource["attributes"])
+                    srcs.append(attrs)
                 else:
-                    srcs.append(
-                        static_url + f"?m={resource['ts']}"
-                    )  # Add a cache-busting query param
+                    if "attributes" in resource:
+                        srcs.append(
+                            {url_attr: url_with_cache, **resource["attributes"]}
+                        )
+                    else:
+                        srcs.append(url_with_cache)
 
         return srcs
 
@@ -1096,7 +1108,8 @@ class Dash(ObsoleteChecker):
         external_links = self.config.external_stylesheets
         links = self._collect_and_register_resources(
             self.css.get_all_css()
-            + self.css._resources._filter_resources(self._hooks.hooks._css_dist)
+            + self.css._resources._filter_resources(self._hooks.hooks._css_dist),
+            url_attr="href",
         )
 
         return "\n".join(
