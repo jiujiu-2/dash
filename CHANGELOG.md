@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 # Changed
 - [#3540](https://github.com/plotly/dash/pull/3540) Expose more types for better static typing options.
+- [#3520](https://github.com/plotly/dash/pull/3520). Set `pointer-events` to `auto` on `Tooltip` to make it possible to interact with tooltip content when `targetable=True`
 
 ## [3.3.0] - 2025-11-12
 
