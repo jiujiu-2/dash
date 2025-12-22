@@ -235,8 +235,3 @@
 .dash-dropdown-wrapper {
     position: relative;
 }
-
-/* Override Radix's position: fixed to use position: absolute when using custom container */
-div[data-radix-popper-content-wrapper]:has(.dash-dropdown-content) {
-    position: absolute !important;
-}

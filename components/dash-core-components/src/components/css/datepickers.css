@@ -226,8 +226,3 @@
     width: 20px;
     height: 20px;
 }
-
-/* Override Radix's position: fixed to use position: absolute when using custom container */
-div[data-radix-popper-content-wrapper]:has(.dash-datepicker-content) {
-    position: absolute !important;
-}

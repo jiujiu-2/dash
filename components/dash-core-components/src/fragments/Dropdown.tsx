@@ -458,9 +458,6 @@ const Dropdown = (props: DropdownProps) => {
                     className="dash-dropdown-content"
                     align="start"
                     sideOffset={5}
-                    collisionBoundary={positioningContainerRef.current?.closest(
-                        '#_dash-app-content'
-                    )}
                     onOpenAutoFocus={e => e.preventDefault()}
                     onKeyDown={handleKeyDown}
                     style={{
