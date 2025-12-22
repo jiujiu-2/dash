@@ -176,6 +176,11 @@ function Input({
         (direction: 'increment' | 'decrement') => {
             const currentValue = parseFloat(input.current.value) || 0;
             const stepAsNum = parseFloat(step as string) || 1;
+
+            // Count decimal places to avoid floating point precision issues
+            const decimalPlaces = (stepAsNum.toString().split('.')[1] || '')
+                .length;
+
             const newValue =
                 direction === 'increment'
                     ? currentValue + stepAsNum
@@ -196,8 +201,13 @@ function Input({
                 );
             }
 
-            input.current.value = constrainedValue.toString();
-            setValue(constrainedValue.toString());
+            // Round to the step's decimal precision
+            const roundedValue = parseFloat(
+                constrainedValue.toFixed(decimalPlaces)
+            );
+
+            input.current.value = roundedValue.toString();
+            setValue(roundedValue.toString());
             onEvent();
         },
         [step, props.min, props.max, onEvent]
