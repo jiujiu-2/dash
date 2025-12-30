@@ -336,7 +336,7 @@ const DatePickerRange = ({
                             id={start_date_id || accessibleId}
                             inputClassName="dash-datepicker-input dash-datepicker-start-date"
                             value={startInputValue}
-                            onChange={e => setStartInputValue(e.target.value)}
+                            onChange={e => setStartInputValue(e.target?.value)}
                             onKeyDown={handleStartInputKeyDown}
                             onFocus={() => {
                                 if (isCalendarOpen) {
@@ -357,7 +357,7 @@ const DatePickerRange = ({
                             id={end_date_id || accessibleId + '-end-date'}
                             inputClassName="dash-datepicker-input dash-datepicker-end-date"
                             value={endInputValue}
-                            onChange={e => setEndInputValue(e.target.value)}
+                            onChange={e => setEndInputValue(e.target?.value)}
                             onKeyDown={handleEndInputKeyDown}
                             onFocus={() => {
                                 if (isCalendarOpen) {
