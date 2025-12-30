@@ -56,6 +56,7 @@ def test_mspv001_popover_visibility_when_app_is_smaller_than_popup(dash_dcc):
     )
 
     dash_dcc.start_server(app, debug=True, use_reloader=False)
+    dash_dcc.driver.set_window_size(1280, 1024)
 
     # Wait for the page to load
     dash_dcc.wait_for_element("#dps")
