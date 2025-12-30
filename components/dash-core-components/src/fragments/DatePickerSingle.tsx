@@ -177,7 +177,7 @@ const DatePickerSingle = ({
                             id={accessibleId}
                             inputClassName="dash-datepicker-input dash-datepicker-end-date"
                             value={inputValue}
-                            onChange={e => setInputValue(e.target.value)}
+                            onChange={e => setInputValue(e.target?.value)}
                             onKeyDown={handleInputKeyDown}
                             placeholder={placeholder}
                             disabled={disabled}
