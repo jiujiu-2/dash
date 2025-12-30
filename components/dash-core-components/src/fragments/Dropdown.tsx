@@ -394,7 +394,6 @@ const Dropdown = (props: DropdownProps) => {
                         }
                     }}
                     className={`dash-dropdown ${className ?? ''}`}
-                    style={style}
                     aria-labelledby={`${accessibleId}-value-count ${accessibleId}-value`}
                     aria-haspopup="listbox"
                     aria-expanded={isOpen}
@@ -540,7 +539,11 @@ const Dropdown = (props: DropdownProps) => {
     );
 
     return (
-        <div ref={positioningContainerRef} className="dash-dropdown-wrapper">
+        <div
+            ref={positioningContainerRef}
+            className="dash-dropdown-wrapper"
+            style={style}
+        >
             {popover}
         </div>
     );
