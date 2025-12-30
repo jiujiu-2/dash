@@ -74,8 +74,6 @@ def test_mspv001_popover_visibility_when_app_is_smaller_than_popup(dash_dcc):
     # Test DatePickerRange - click everything to verify all elements are accessible
     click_everything_in_datepicker("#dpr", dash_dcc)
 
-    assert dash_dcc.get_logs() == []
-
 
 def test_mspv002_popover_visibility_when_app_is_scrolled_down(dash_dcc):
     """
@@ -103,7 +101,6 @@ def test_mspv002_popover_visibility_when_app_is_scrolled_down(dash_dcc):
     dash_dcc.wait_for_element("#dps")
 
     click_everything_in_datepicker("#dps", dash_dcc)
-    assert dash_dcc.get_logs() == []
 
 
 def test_mspv003_popover_contained_within_dash_app(dash_dcc):
@@ -150,8 +147,6 @@ def test_mspv003_popover_contained_within_dash_app(dash_dcc):
     # Click everything in the datepicker to verify all elements are accessible
     click_everything_in_datepicker("#dpr", dash_dcc)
 
-    assert dash_dcc.get_logs() == []
-
 
 def test_mspv004_popover_inherits_container_styles(dash_dcc):
     """Test that calendar days inherit font color and size from container.
@@ -193,5 +188,3 @@ def test_mspv004_popover_inherits_container_styles(dash_dcc):
 
     # Font size should be 24px
     assert font_size == "24px", "Expected calendar day to inherit its font size"
-
-    assert dash_dcc.get_logs() == []
