@@ -39,6 +39,8 @@ const DatePickerSingle = ({
     day_size = 34,
     number_of_months_shown = 1,
     calendar_orientation,
+    with_portal = false,
+    with_full_screen_portal = false,
 }: DatePickerSingleProps) => {
     const [internalDate, setInternalDate] = useState(strAsDate(date));
     const direction = is_RTL
@@ -61,6 +63,7 @@ const DatePickerSingle = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const calendarRef = useRef<CalendarHandle>(null);
+    const hasPortal = with_portal || with_full_screen_portal;
 
     useEffect(() => {
         setInternalDate(strAsDate(date));
@@ -200,9 +203,21 @@ const DatePickerSingle = ({
 
                 <Popover.Portal container={containerRef.current}>
                     <Popover.Content
-                        className="dash-datepicker-content"
-                        align="start"
-                        sideOffset={5}
+                        className={`dash-datepicker-content${
+                            hasPortal ? ' dash-datepicker-portal' : ''
+                        }${
+                            with_full_screen_portal
+                                ? ' dash-datepicker-fullscreen'
+                                : ''
+                        }`}
+                        align={hasPortal ? 'center' : 'start'}
+                        sideOffset={hasPortal ? 0 : 5}
+                        avoidCollisions={!hasPortal}
+                        onInteractOutside={
+                            with_full_screen_portal
+                                ? e => e.preventDefault()
+                                : undefined
+                        }
                         onOpenAutoFocus={e => e.preventDefault()}
                         onCloseAutoFocus={e => {
                             e.preventDefault();
@@ -212,6 +227,15 @@ const DatePickerSingle = ({
                             }
                         }}
                     >
+                        {with_full_screen_portal && (
+                            <button
+                                className="dash-datepicker-close-button"
+                                onClick={() => setIsCalendarOpen(false)}
+                                aria-label="Close calendar"
+                            >
+                                <Cross1Icon />
+                            </button>
+                        )}
                         <Calendar
                             ref={calendarRef}
                             initialVisibleDate={initialMonth}
