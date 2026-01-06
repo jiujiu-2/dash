@@ -205,7 +205,7 @@
 }
 
 .dash-datepicker-close-button:hover {
-    background: var(--Dash-Fill-Weak);
+    background: var(--Dash-Fill-Interactive-Weak);
     color: var(--Dash-Fill-Interactive-Strong);
 }
 
@@ -280,7 +280,7 @@
 }
 
 .dash-datepicker-month-nav:hover:not(:disabled) {
-    background: var(--Dash-Fill-Weak);
+    background: var(--Dash-Fill-Interactive-Weak);
 }
 
 .dash-datepicker-month-nav:focus-visible {
