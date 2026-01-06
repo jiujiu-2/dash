@@ -143,6 +143,75 @@
     z-index: 500;
     box-shadow: 0px 10px 38px -10px var(--Dash-Shading-Strong),
         0px 10px 20px -15px var(--Dash-Shading-Weak);
+    overscroll-behavior: contain;
+}
+
+.dash-datepicker
+    [data-radix-popper-content-wrapper]:has(.dash-datepicker-portal) {
+    transform: none !important;
+}
+
+.dash-datepicker-portal {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--Dash-Shading-Strong);
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+    padding: 0;
+    pointer-events: none;
+}
+
+.dash-datepicker-portal .dash-datepicker-calendar-wrapper {
+    background: var(--Dash-Fill-Inverse-Strong);
+    border-radius: var(--Dash-Spacing);
+    border: 1px solid var(--Dash-Stroke-Strong);
+    padding: 16px;
+    box-shadow: 0px 10px 38px -10px var(--Dash-Shading-Strong),
+        0px 10px 20px -15px var(--Dash-Shading-Weak);
+    z-index: 1;
+    pointer-events: auto;
+    width: fit-content;
+    max-width: 95vw;
+}
+
+.dash-datepicker-fullscreen {
+    pointer-events: auto;
+    background: var(--Dash-Fill-Inverse-Strong);
+}
+
+.dash-datepicker-close-button {
+    position: fixed;
+    top: calc(var(--Dash-Spacing) * 2);
+    right: calc(var(--Dash-Spacing) * 2);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--Dash-Fill-Inverse-Strong);
+    border: none;
+    border-radius: var(--Dash-Spacing);
+    color: var(--Dash-Text-Strong);
+    cursor: pointer;
+    z-index: 501;
+    pointer-events: auto;
+}
+
+.dash-datepicker-close-button:hover {
+    background: var(--Dash-Fill-Weak);
+    color: var(--Dash-Fill-Interactive-Strong);
+}
+
+.dash-datepicker-close-button:focus {
+    outline: 2px solid var(--Dash-Fill-Interactive-Strong);
+    outline-offset: 2px;
 }
 
 .dash-datepicker-calendar-wrapper {
@@ -155,6 +224,7 @@
     display: flex;
     align-items: flex-start;
     gap: calc(var(--Dash-Spacing) * 4);
+    flex-wrap: wrap;
 }
 
 .dash-datepicker-controls {
@@ -225,9 +295,4 @@
 .dash-datepicker-month-nav svg {
     width: 20px;
     height: 20px;
-}
-
-/* Override Radix's position: fixed to use position: absolute when using custom container */
-div[data-radix-popper-content-wrapper]:has(.dash-datepicker-content) {
-    position: absolute !important;
 }

@@ -51,6 +51,8 @@ const DatePickerRange = ({
     end_date_id,
     start_date_placeholder_text = 'Start Date',
     end_date_placeholder_text = 'End Date',
+    with_portal = false,
+    with_full_screen_portal = false,
 }: DatePickerRangeProps) => {
     const [internalStartDate, setInternalStartDate] = useState(
         strAsDate(start_date)
@@ -102,6 +104,7 @@ const DatePickerRange = ({
     const startInputRef = useRef<HTMLInputElement | null>(null);
     const endInputRef = useRef<HTMLInputElement | null>(null);
     const calendarRef = useRef<CalendarHandle>(null);
+    const hasPortal = with_portal || with_full_screen_portal;
 
     useEffect(() => {
         setInternalStartDate(strAsDate(start_date));
@@ -333,7 +336,7 @@ const DatePickerRange = ({
                             id={start_date_id || accessibleId}
                             inputClassName="dash-datepicker-input dash-datepicker-start-date"
                             value={startInputValue}
-                            onChange={e => setStartInputValue(e.target.value)}
+                            onChange={e => setStartInputValue(e.target?.value)}
                             onKeyDown={handleStartInputKeyDown}
                             onFocus={() => {
                                 if (isCalendarOpen) {
@@ -354,7 +357,7 @@ const DatePickerRange = ({
                             id={end_date_id || accessibleId + '-end-date'}
                             inputClassName="dash-datepicker-input dash-datepicker-end-date"
                             value={endInputValue}
-                            onChange={e => setEndInputValue(e.target.value)}
+                            onChange={e => setEndInputValue(e.target?.value)}
                             onKeyDown={handleEndInputKeyDown}
                             onFocus={() => {
                                 if (isCalendarOpen) {
@@ -381,12 +384,21 @@ const DatePickerRange = ({
 
                 <Popover.Portal container={containerRef.current}>
                     <Popover.Content
-                        className="dash-datepicker-content"
-                        align="start"
-                        sideOffset={5}
-                        collisionBoundary={containerRef.current?.closest(
-                            '#_dash-app-content'
-                        )}
+                        className={`dash-datepicker-content${
+                            hasPortal ? ' dash-datepicker-portal' : ''
+                        }${
+                            with_full_screen_portal
+                                ? ' dash-datepicker-fullscreen'
+                                : ''
+                        }`}
+                        align={hasPortal ? 'center' : 'start'}
+                        sideOffset={hasPortal ? 0 : 5}
+                        avoidCollisions={!hasPortal}
+                        onInteractOutside={
+                            with_full_screen_portal
+                                ? e => e.preventDefault()
+                                : undefined
+                        }
                         onOpenAutoFocus={e => e.preventDefault()}
                         onCloseAutoFocus={e => {
                             e.preventDefault();
@@ -407,6 +419,15 @@ const DatePickerRange = ({
                             }
                         }}
                     >
+                        {with_full_screen_portal && (
+                            <button
+                                className="dash-datepicker-close-button"
+                                onClick={() => setIsCalendarOpen(false)}
+                                aria-label="Close calendar"
+                            >
+                                <Cross1Icon />
+                            </button>
+                        )}
                         <Calendar
                             ref={calendarRef}
                             initialVisibleDate={initialCalendarDate}

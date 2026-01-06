@@ -1,5 +1,6 @@
 import time
 import sys
+import pytest
 from dash import Dash, Input, Output, html, dcc
 from selenium.webdriver.common.keys import Keys
 
@@ -144,6 +145,93 @@ def test_inni005_stepper_decrement_bug(dash_dcc, input_range_app):
     # Initial value is 17, should be able to decrement to 16
     decrement_btn.click()
     dash_dcc.wait_for_text_to_equal("#output", "16")
+
+    assert dash_dcc.get_logs() == []
+
+
+@pytest.mark.parametrize("step", [0.1, 0.01, 0.001, 0.0001])
+def test_inni006_stepper_floating_point_precision(dash_dcc, step):
+    """Test that stepper increments/decrements with decimal steps don't accumulate floating point errors."""
+
+    app = Dash(__name__)
+    app.layout = html.Div(
+        [
+            dcc.Input(id="decimal-input", value=0, type="number", step=step),
+            html.Div(id="output"),
+        ]
+    )
+
+    @app.callback(Output("output", "children"), [Input("decimal-input", "value")])
+    def update_output(val):
+        return val
+
+    dash_dcc.start_server(app)
+    increment_btn = dash_dcc.find_element(".dash-stepper-increment")
+    decrement_btn = dash_dcc.find_element(".dash-stepper-decrement")
+
+    # Determine decimal places for formatting
+    decimal_places = len(str(step).split(".")[1]) if "." in str(step) else 0
+    num_clicks = 9
+
+    # Test increment: without precision fix, accumulates floating point errors (e.g., 0.30000000000000004)
+    for i in range(1, num_clicks + 1):
+        increment_btn.click()
+        expected = format(step * i, f".{decimal_places}f")
+        dash_dcc.wait_for_text_to_equal("#output", expected)
+
+    # Test decrement: should go back down through the same values
+    for i in range(num_clicks - 1, 0, -1):
+        decrement_btn.click()
+        expected = format(step * i, f".{decimal_places}f")
+        dash_dcc.wait_for_text_to_equal("#output", expected)
+
+    # One more decrement to get back to 0
+    decrement_btn.click()
+    dash_dcc.wait_for_text_to_equal("#output", "0")
+
+    assert dash_dcc.get_logs() == []
+
+
+@pytest.mark.parametrize("step", [0.00001, 0.000001])
+def test_inni007_stepper_very_small_steps(dash_dcc, step):
+    """Test that stepper works correctly with very small decimal steps."""
+
+    app = Dash(__name__)
+    app.layout = html.Div(
+        [
+            dcc.Input(id="decimal-input", value=0, type="number", step=step),
+            html.Div(id="output"),
+        ]
+    )
+
+    @app.callback(Output("output", "children"), [Input("decimal-input", "value")])
+    def update_output(val):
+        return val
+
+    dash_dcc.start_server(app)
+    increment_btn = dash_dcc.find_element(".dash-stepper-increment")
+    decrement_btn = dash_dcc.find_element(".dash-stepper-decrement")
+
+    # For very small steps, format with enough precision then strip trailing zeros
+    step_str = f"{step:.10f}".rstrip("0").rstrip(".")
+    decimal_places = len(step_str.split(".")[1]) if "." in step_str else 0
+    num_clicks = 5
+
+    # Test increment
+    for i in range(1, num_clicks + 1):
+        increment_btn.click()
+        expected = f"{step * i:.{decimal_places}f}".rstrip("0").rstrip(".")
+        dash_dcc.wait_for_text_to_equal("#output", expected)
+
+    # Test decrement
+    for i in range(num_clicks - 1, 0, -1):
+        decrement_btn.click()
+        expected = f"{step * i:.{decimal_places}f}".rstrip("0").rstrip(".")
+        dash_dcc.wait_for_text_to_equal("#output", expected)
+
+    # One more decrement to get back to 0
+    decrement_btn.click()
+    dash_dcc.wait_for_text_to_equal("#output", "0")
 
     assert dash_dcc.get_logs() == []
 

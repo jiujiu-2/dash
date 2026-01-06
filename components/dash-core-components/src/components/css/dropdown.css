@@ -84,6 +84,7 @@
     z-index: 500;
     box-shadow: 0px 10px 38px -10px var(--Dash-Shading-Strong),
         0px 10px 20px -15px var(--Dash-Shading-Weak);
+    overscroll-behavior: contain;
 }
 
 .dash-dropdown-value-count,
@@ -234,9 +235,4 @@
 /* Positioning container for the dropdown */
 .dash-dropdown-wrapper {
     position: relative;
-}
-
-/* Override Radix's position: fixed to use position: absolute when using custom container */
-div[data-radix-popper-content-wrapper]:has(.dash-dropdown-content) {
-    position: absolute !important;
 }
