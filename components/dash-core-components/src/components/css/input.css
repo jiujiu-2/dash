@@ -101,7 +101,7 @@
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
-    color: var(--Dash -Text-Primary);
+    color: var(--Dash-Text-Primary);
 }
 
 .dash-input-stepper:hover,
