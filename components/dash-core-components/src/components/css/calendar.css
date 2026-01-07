@@ -30,7 +30,7 @@
 
 .dash-datepicker-calendar td:hover {
     cursor: pointer;
-    background-color: var(--Dash-Fill-Weak);
+    background-color: var(--Dash-Fill-Interactive-Weak);
 }
 
 .dash-datepicker-calendar td:focus {

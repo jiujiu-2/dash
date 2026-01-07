@@ -102,7 +102,7 @@ function Tabs({
     colors = {
         border: 'var(--Dash-Stroke-Weak)',
         primary: 'var(--Dash-Fill-Interactive-Strong)',
-        background: 'var(--Dash-Fill-Weak)',
+        background: 'var(--Dash-Fill-Interactive-Weak)',
     },
     vertical = false,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

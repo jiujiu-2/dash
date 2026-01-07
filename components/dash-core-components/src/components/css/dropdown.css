@@ -108,7 +108,7 @@
     padding: 4px;
     border-radius: 4px;
     color: var(--Dash-Text-Weak);
-    background: var(--Dash-Fill-Weak);
+    background: var(--Dash-Fill-Interactive-Weak);
     font-size: 0.875em;
 }
 
