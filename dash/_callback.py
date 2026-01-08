@@ -79,7 +79,7 @@ def callback(
     on_error: Optional[Callable[[Exception], Any]] = None,
     api_endpoint: Optional[str] = None,
     optional: Optional[bool] = False,
-    hidden: Optional[bool] = False,
+    hidden: Optional[bool] = None,
     **_kwargs,
 ) -> Callable[..., Any]:
     """
@@ -181,6 +181,7 @@ def callback(
     config_prevent_initial_callbacks = _kwargs.pop(
         "config_prevent_initial_callbacks", False
     )
+    config_hide_all_callbacks = _kwargs.pop("config_hide_all_callbacks", False)
     callback_map = _kwargs.pop("callback_map", GLOBAL_CALLBACK_MAP)
     callback_list = _kwargs.pop("callback_list", GLOBAL_CALLBACK_LIST)
 
@@ -222,6 +223,7 @@ def callback(
         callback_list,
         callback_map,
         config_prevent_initial_callbacks,
+        config_hide_all_callbacks,
         *_args,
         **_kwargs,
         background=background_spec,
@@ -265,6 +267,7 @@ def insert_callback(
     callback_list,
     callback_map,
     config_prevent_initial_callbacks,
+    config_hide_all_callbacks,
     output,
     outputs_indices,
     inputs,
@@ -277,10 +280,13 @@ def insert_callback(
     dynamic_creator: Optional[bool] = False,
     no_output=False,
     optional=False,
-    hidden=False,
+    hidden=None,
 ):
     if prevent_initial_call is None:
         prevent_initial_call = config_prevent_initial_callbacks
+
+    if hidden is None:
+        hidden = config_hide_all_callbacks
 
     _validate.validate_duplicate_output(
         output, prevent_initial_call, config_prevent_initial_callbacks
@@ -600,6 +606,7 @@ def register_callback(
     callback_list,
     callback_map,
     config_prevent_initial_callbacks,
+    config_hide_all_callbacks,
     *_args,
     **_kwargs,
 ):
@@ -639,6 +646,7 @@ def register_callback(
         callback_list,
         callback_map,
         config_prevent_initial_callbacks,
+        config_hide_all_callbacks,
         insert_output,
         output_indices,
         flat_inputs,
@@ -651,7 +659,7 @@ def register_callback(
         running=running,
         no_output=not has_output,
         optional=_kwargs.get("optional", False),
-        hidden=_kwargs.get("hidden", False),
+        hidden=_kwargs.get("hidden"),
     )
 
     # pylint: disable=too-many-locals
@@ -836,6 +844,7 @@ def register_clientside_callback(
     callback_list,
     callback_map,
     config_prevent_initial_callbacks,
+    config_hide_all_callbacks,
     inline_scripts,
     clientside_function: ClientsideFuncType,
     *args,
@@ -847,6 +856,7 @@ def register_clientside_callback(
         callback_list,
         callback_map,
         config_prevent_initial_callbacks,
+        config_hide_all_callbacks,
         output,
         None,
         inputs,

@@ -367,6 +367,13 @@ class Dash(ObsoleteChecker):
         those callbacks you wish to have an initial call. This setting has no
         effect on triggering callbacks when their inputs change later on.
 
+    :param hide_all_callbacks: Default ``False``: Sets the default value of
+        ``hidden`` for all callbacks added to the app. Normally all callbacks
+        are visible in the devtools callbacks tab. You can set this for
+        individual callbacks by setting ``hidden`` in their definitions, or set
+        it ``True`` here in which case you must explicitly set it ``False`` for
+        those callbacks you wish to remain visible in the devtools callbacks tab.
+
     :param show_undo_redo: Default ``False``, set to ``True`` to enable undo
         and redo buttons for stepping through the history of the app state.
     :type show_undo_redo: boolean
@@ -457,6 +464,7 @@ class Dash(ObsoleteChecker):
         external_stylesheets: Optional[Sequence[Union[str, Dict[str, Any]]]] = None,
         suppress_callback_exceptions: Optional[bool] = None,
         prevent_initial_callbacks: bool = False,
+        hide_all_callbacks: bool = False,
         show_undo_redo: bool = False,
         extra_hot_reload_paths: Optional[Sequence[str]] = None,
         plugins: Optional[list] = None,
@@ -537,6 +545,7 @@ class Dash(ObsoleteChecker):
                 "suppress_callback_exceptions", suppress_callback_exceptions, False
             ),
             prevent_initial_callbacks=prevent_initial_callbacks,
+            hide_all_callbacks=hide_all_callbacks,
             show_undo_redo=show_undo_redo,
             extra_hot_reload_paths=extra_hot_reload_paths or [],
             title=title,
@@ -671,6 +680,7 @@ class Dash(ObsoleteChecker):
                 self._callback_list,
                 self.callback_map,
                 self.config.prevent_initial_callbacks,
+                self.config.hide_all_callbacks,
                 self._inline_scripts,
                 clientside_function,
                 *args,
@@ -1433,6 +1443,7 @@ class Dash(ObsoleteChecker):
             self._callback_list,
             self.callback_map,
             self.config.prevent_initial_callbacks,
+            self.config.hide_all_callbacks,
             self._inline_scripts,
             clientside_function,
             *args,
@@ -1456,6 +1467,7 @@ class Dash(ObsoleteChecker):
         return _callback.callback(
             *_args,
             config_prevent_initial_callbacks=self.config.prevent_initial_callbacks,
+            config_hide_all_callbacks=self.config.hide_all_callbacks,
             callback_list=self._callback_list,
             callback_map=self.callback_map,
             callback_api_paths=self.callback_api_paths,
