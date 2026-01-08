@@ -255,6 +255,7 @@ def clientside_callback(clientside_function: ClientsideFuncType, *args, **kwargs
         GLOBAL_CALLBACK_LIST,
         GLOBAL_CALLBACK_MAP,
         False,
+        False,
         GLOBAL_INLINE_SCRIPTS,
         clientside_function,
         *args,
