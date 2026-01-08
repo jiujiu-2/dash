@@ -41,6 +41,7 @@ from ._utils import (
 from . import _validate
 from .background_callback.managers import BaseBackgroundCallbackManager
 from ._callback_context import context_value
+from ._get_app import get_app
 from ._no_update import NoUpdate
 
 
@@ -178,10 +179,13 @@ def callback(
 
     background_spec: Any = None
 
-    config_prevent_initial_callbacks = _kwargs.pop(
-        "config_prevent_initial_callbacks", False
+    # Get prevent_initial_callbacks and hide_all_callbacks from get_app().config
+    current_app_config = get_app().config
+
+    config_prevent_initial_callbacks = current_app_config.get(
+        "prevent_initial_callbacks", False
     )
-    config_hide_all_callbacks = _kwargs.pop("config_hide_all_callbacks", False)
+    config_hide_all_callbacks = current_app_config.get("hide_all_callbacks", False)
     callback_map = _kwargs.pop("callback_map", GLOBAL_CALLBACK_MAP)
     callback_list = _kwargs.pop("callback_list", GLOBAL_CALLBACK_LIST)
 

@@ -1466,8 +1466,6 @@ class Dash(ObsoleteChecker):
         """
         return _callback.callback(
             *_args,
-            config_prevent_initial_callbacks=self.config.prevent_initial_callbacks,
-            config_hide_all_callbacks=self.config.hide_all_callbacks,
             callback_list=self._callback_list,
             callback_map=self.callback_map,
             callback_api_paths=self.callback_api_paths,
