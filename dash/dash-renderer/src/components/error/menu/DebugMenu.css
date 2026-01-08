@@ -141,7 +141,6 @@
 }
 .dash-debug-menu__outer.dash-debug-menu__outer--expanded {
     max-width: calc(100vw - 50px);
-    overflow-x: auto;
 }
 
 .dash-debug-menu__upgrade-tooltip {
