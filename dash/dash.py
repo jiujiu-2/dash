@@ -69,12 +69,7 @@ from . import _validate
 from . import _watch
 from . import _get_app
 
-from ._get_app import (
-    get_app,
-    with_app_context,
-    with_app_context_async,
-    with_app_context_factory,
-)
+from ._get_app import with_app_context, with_app_context_async, with_app_context_factory
 from ._grouping import map_grouping, grouping_len, update_args_group
 from ._obsolete import ObsoleteChecker
 
@@ -1659,14 +1654,11 @@ class Dash(ObsoleteChecker):
 
             self.callback_map[k] = _callback.GLOBAL_CALLBACK_MAP.pop(k)
 
-        # Get config of current app instance
-        current_app_config = get_app().config
-
         self._callback_list.extend(_callback.GLOBAL_CALLBACK_LIST)
         # For each callback function, if the hidden parameter uses the default value None,
         # replace it with the actual value of the hide_all_callbacks property of the current application instance.
         self._callback_list = [
-            {**_callback, "hidden": current_app_config.get("hide_all_callbacks", False)}
+            {**_callback, "hidden": self.config.get("hide_all_callbacks", False)}
             if _callback.get("hidden") is None
             else _callback
             for _callback in self._callback_list
