@@ -128,20 +128,33 @@ export default class Clipboard extends React.Component {
     }
 
     render() {
-        const {id, title, className, style} = this.props;
-        const copyIcon = <FontAwesomeIcon icon={faCopy} />;
-        const copiedIcon = <FontAwesomeIcon icon={faCheckCircle} />;
-        const btnIcon = this.state.copied ? copiedIcon : copyIcon;
+        const {
+            id,
+            title,
+            className,
+            style,
+            copied_className,
+            copied_style,
+            children,
+            copied_children,
+        } = this.props;
+
+        const isCopied = this.state.copied;
+
+        const content = isCopied
+            ? copied_children ?? <FontAwesomeIcon icon={faCheckCircle} />
+            : children ?? <FontAwesomeIcon icon={faCopy} />;
 
         return clipboardAPI ? (
             <LoadingElement
+                elementType={'button'}
                 id={id}
                 title={title}
-                style={style}
-                className={className}
+                style={isCopied ? copied_style ?? style : style}
+                className={isCopied ? copied_className ?? className : className}
                 onClick={this.onClickHandler}
             >
-                <i> {btnIcon}</i>
+                {content}
             </LoadingElement>
         ) : null;
     }
@@ -159,6 +172,16 @@ Clipboard.propTypes = {
      * The ID used to identify this component.
      */
     id: PropTypes.string,
+
+    /**
+     * The children of this component.  By default copy icon
+     */
+    children: PropTypes.node,
+
+    /**
+     * The children of this component displayed while copying.  By default checked icon
+     */
+    copied_children: PropTypes.node,
 
     /**
      * The id of target component containing text to copy to the clipboard.
@@ -196,6 +219,15 @@ Clipboard.propTypes = {
      * The class  name of the icon element
      */
     className: PropTypes.string,
+    /**
+     * The icon's styles while copying
+     */
+    copied_style: PropTypes.object,
+
+    /**
+     * The class  name of the icon element while copying
+     */
+    copied_className: PropTypes.string,
 
     /**
      * Dash-assigned callback that gets fired when the value changes.
