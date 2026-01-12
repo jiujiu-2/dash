@@ -2,6 +2,14 @@
 All notable changes to `dash` will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [4.0.0rc6] - 2026-01-07
+
+## Added
+- Restored missing implementation for `with_portal` and `with_full_screen_portal` in datepickers
+
+## Changed
+- Bugfixes for feedback received in `rc5`: notably, popovers are `position: fixed` once again.
+
 ## [4.0.0rc5] - 2025-12-16
 
 ## Added
