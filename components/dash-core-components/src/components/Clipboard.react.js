@@ -147,7 +147,6 @@ export default class Clipboard extends React.Component {
 
         return clipboardAPI ? (
             <LoadingElement
-                elementType={'button'}
                 id={id}
                 title={title}
                 style={isCopied ? copied_style ?? style : style}
