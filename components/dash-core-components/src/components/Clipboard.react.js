@@ -128,20 +128,12 @@ export default class Clipboard extends React.Component {
     }
 
     render() {
-        const {
-            id,
-            title,
-            className,
-            style,
-            copied_className,
-            copied_style,
-            children,
-            copied_children,
-        } = this.props;
+        const {id, title, className, style, children, copied_children} =
+            this.props;
 
         const isCopied = this.state.copied;
 
-        const content = isCopied
+        const button_children = isCopied
             ? copied_children ?? <FontAwesomeIcon icon={faCheckCircle} />
             : children ?? <FontAwesomeIcon icon={faCopy} />;
 
@@ -149,11 +141,11 @@ export default class Clipboard extends React.Component {
             <LoadingElement
                 id={id}
                 title={title}
-                style={isCopied ? copied_style ?? style : style}
-                className={isCopied ? copied_className ?? className : className}
+                style={style}
+                className={className}
                 onClick={this.onClickHandler}
             >
-                {content}
+                {button_children}
             </LoadingElement>
         ) : null;
     }
@@ -173,12 +165,12 @@ Clipboard.propTypes = {
     id: PropTypes.string,
 
     /**
-     * The children of this component.  By default copy icon
+     * Children rendered inside the Clipboard button before copying. By default, a copy icon.
      */
     children: PropTypes.node,
 
     /**
-     * The children of this component displayed while copying.  By default checked icon
+     * Children rendered inside the Clipboard button after the value has been copied. By default, a check icon.
      */
     copied_children: PropTypes.node,
 
@@ -195,7 +187,7 @@ Clipboard.propTypes = {
     content: PropTypes.string,
 
     /**
-     * The number of times copy button was clicked
+     * The number of times Clipboard button was clicked
      */
     n_clicks: PropTypes.number,
 
@@ -218,15 +210,6 @@ Clipboard.propTypes = {
      * The class  name of the icon element
      */
     className: PropTypes.string,
-    /**
-     * The icon's styles while copying
-     */
-    copied_style: PropTypes.object,
-
-    /**
-     * The class  name of the icon element while copying
-     */
-    copied_className: PropTypes.string,
 
     /**
      * Dash-assigned callback that gets fired when the value changes.
