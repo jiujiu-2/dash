@@ -367,13 +367,6 @@ class Dash(ObsoleteChecker):
         those callbacks you wish to have an initial call. This setting has no
         effect on triggering callbacks when their inputs change later on.
 
-    :param hide_all_callbacks: Default ``False``: Sets the default value of
-        ``hidden`` for all callbacks added to the app. Normally all callbacks
-        are visible in the devtools callbacks tab. You can set this for
-        individual callbacks by setting ``hidden`` in their definitions, or set
-        it ``True`` here in which case you must explicitly set it ``False`` for
-        those callbacks you wish to remain visible in the devtools callbacks tab.
-
     :param show_undo_redo: Default ``False``, set to ``True`` to enable undo
         and redo buttons for stepping through the history of the app state.
     :type show_undo_redo: boolean
@@ -464,7 +457,6 @@ class Dash(ObsoleteChecker):
         external_stylesheets: Optional[Sequence[Union[str, Dict[str, Any]]]] = None,
         suppress_callback_exceptions: Optional[bool] = None,
         prevent_initial_callbacks: bool = False,
-        hide_all_callbacks: bool = False,
         show_undo_redo: bool = False,
         extra_hot_reload_paths: Optional[Sequence[str]] = None,
         plugins: Optional[list] = None,
@@ -545,7 +537,6 @@ class Dash(ObsoleteChecker):
                 "suppress_callback_exceptions", suppress_callback_exceptions, False
             ),
             prevent_initial_callbacks=prevent_initial_callbacks,
-            hide_all_callbacks=hide_all_callbacks,
             show_undo_redo=show_undo_redo,
             extra_hot_reload_paths=extra_hot_reload_paths or [],
             title=title,
@@ -553,6 +544,7 @@ class Dash(ObsoleteChecker):
             include_pages_meta=include_pages_meta,
             description=description,
             health_endpoint=health_endpoint,
+            hide_all_callbacks=False,
         )
         self.config.set_read_only(
             [
@@ -1655,14 +1647,16 @@ class Dash(ObsoleteChecker):
             self.callback_map[k] = _callback.GLOBAL_CALLBACK_MAP.pop(k)
 
         self._callback_list.extend(_callback.GLOBAL_CALLBACK_LIST)
+
         # For each callback function, if the hidden parameter uses the default value None,
-        # replace it with the actual value of the hide_all_callbacks property of the current application instance.
+        # replace it with the actual value of the self.config.hide_all_callbacks.
         self._callback_list = [
             {**_callback, "hidden": self.config.get("hide_all_callbacks", False)}
             if _callback.get("hidden") is None
             else _callback
             for _callback in self._callback_list
         ]
+
         _callback.GLOBAL_CALLBACK_LIST.clear()
 
         _validate.validate_background_callbacks(self.callback_map)
@@ -2310,6 +2304,7 @@ class Dash(ObsoleteChecker):
         port: Optional[Union[str, int]] = None,
         proxy: Optional[str] = None,
         debug: Optional[bool] = None,
+        hide_all_callbacks: bool = False,
         jupyter_mode: Optional[JupyterDisplayMode] = None,
         jupyter_width: str = "100%",
         jupyter_height: int = 650,
@@ -2357,6 +2352,14 @@ class Dash(ObsoleteChecker):
             ``enable_dev_tools`` is called directly, and ``False`` when called
             via ``run``. env: ``DASH_DEBUG``
         :type debug: bool
+
+        :param hide_all_callbacks: Default ``False``: Sets the default value of
+            ``hidden`` for all callbacks added to the app. Normally all callbacks
+            are visible in the devtools callbacks tab. You can set this for
+            individual callbacks by setting ``hidden`` in their definitions, or set
+            it ``True`` here in which case you must explicitly set it ``False`` for
+            those callbacks you wish to remain visible in the devtools callbacks tab.
+        :type hide_all_callbacks: bool
 
         :param dev_tools_ui: Show the dev tools UI. env: ``DASH_UI``
         :type dev_tools_ui: bool
@@ -2424,6 +2427,10 @@ class Dash(ObsoleteChecker):
 
         :return:
         """
+
+        # Update self.config.hide_all_callbacks
+        self.config.update({'hide_all_callbacks': hide_all_callbacks})
+
         if debug is None:
             debug = get_combined_config("debug", None, False)
 
