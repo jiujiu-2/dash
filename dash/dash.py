@@ -2429,7 +2429,7 @@ class Dash(ObsoleteChecker):
         """
 
         # Update self.config.hide_all_callbacks
-        self.config.update({'hide_all_callbacks': hide_all_callbacks})
+        self.config.update({"hide_all_callbacks": hide_all_callbacks})
 
         if debug is None:
             debug = get_combined_config("debug", None, False)
