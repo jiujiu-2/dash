@@ -2,6 +2,12 @@
 All notable changes to `dash` will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## UNRELEASED
+
+## Added
+- Add a prop to sliders, `allow_direct_input`, that can be used to disable the inputs rendered with sliders.
+- Improve CSS styles in calendar when looking at selected dates outside the current calendar month (`show_outside_days=True`)
+
 ## [4.0.0rc6] - 2026-01-07
 
 ## Added
