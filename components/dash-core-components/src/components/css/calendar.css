@@ -41,17 +41,34 @@
     position: relative;
 }
 
-.dash-datepicker-calendar td.dash-datepicker-calendar-date-highlighted {
+/* Highlighted dates (i.e. dates within a selected range) get highlight colours */
+.dash-datepicker-calendar
+    td.dash-datepicker-calendar-date-highlighted:not(
+        .dash-datepicker-calendar-date-outside
+    ) {
     background-color: var(--Dash-Fill-Interactive-Weak);
     color: var(--Dash-Fill-Interactive-Strong);
 }
 
-.dash-datepicker-calendar td.dash-datepicker-calendar-date-selected {
+/* Outside days get highlighted colours only on hover */
+.dash-datepicker-calendar
+    td.dash-datepicker-calendar-date-highlighted.dash-datepicker-calendar-date-outside:hover {
+    background-color: var(--Dash-Fill-Interactive-Weak);
+    color: var(--Dash-Fill-Interactive-Strong);
+}
+
+/* Selected dates (start & end) get accented colours */
+.dash-datepicker-calendar
+    td.dash-datepicker-calendar-date-selected:not(
+        .dash-datepicker-calendar-date-outside
+    ) {
     background-color: var(--Dash-Fill-Interactive-Strong);
     color: var(--Dash-Fill-Inverse-Strong);
 }
 
-.dash-datepicker-calendar td.dash-datepicker-calendar-date-selected {
+/* Outside days, when selected, get accented colours only when active (being clicked) */
+.dash-datepicker-calendar
+    td.dash-datepicker-calendar-date-outside.dash-datepicker-calendar-date-selected:active {
     background-color: var(--Dash-Fill-Interactive-Strong);
     color: var(--Dash-Fill-Inverse-Strong);
 }
