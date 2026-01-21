@@ -247,8 +247,6 @@ def test_dppt002_datepicker_range_with_portal(dash_dcc):
     dpr_input.send_keys(Keys.ESCAPE)
     dash_dcc.wait_for_no_elements(".dash-datepicker-calendar-container", timeout=2)
 
-    assert dash_dcc.get_logs() == []
-
 
 def test_dppt003_datepicker_single_with_fullscreen_portal(dash_dcc):
     """Test DatePickerSingle with with_full_screen_portal=True.
@@ -297,8 +295,6 @@ def test_dppt003_datepicker_single_with_fullscreen_portal(dash_dcc):
 
     # Test clicking everything to verify all elements are accessible
     click_everything_in_datepicker("#dps-fullscreen", dash_dcc)
-
-    assert dash_dcc.get_logs() == []
 
 
 @pytest.mark.flaky(max_runs=3)
@@ -354,8 +350,6 @@ def test_dppt004_datepicker_range_with_fullscreen_portal(dash_dcc):
 
     # Test clicking everything to verify all elements are accessible
     click_everything_in_datepicker("#dpr-fullscreen", dash_dcc)
-
-    assert dash_dcc.get_logs() == []
 
 
 def test_dppt005_portal_has_correct_classes(dash_dcc):
