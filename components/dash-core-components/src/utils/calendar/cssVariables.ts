@@ -25,11 +25,15 @@ export function captureCSSForPortal(
     }
 
     // Capture key inherited properties
-    const inheritedProps = ['fontFamily', 'fontSize', 'color'];
+    const inheritedProps = ['font-family', 'font-size', 'color'];
     inheritedProps.forEach(prop => {
         const value = computedStyle.getPropertyValue(prop);
         if (value) {
-            styles[prop] = value;
+            // Convert hyphenated CSS property names to camelCase for React
+            const camelCaseProp = prop.replace(/-([a-z])/g, (_, letter) =>
+                letter.toUpperCase()
+            );
+            styles[camelCaseProp] = value;
         }
     });
 

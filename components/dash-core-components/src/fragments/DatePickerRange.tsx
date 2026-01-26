@@ -110,7 +110,7 @@ const DatePickerRange = ({
     // Capture CSS variables for portal mode
     const portalStyle = useMemo(() => {
         return hasPortal ? captureCSSForPortal(containerRef) : undefined;
-    }, [hasPortal]);
+    }, [hasPortal, isCalendarOpen]);
 
     useEffect(() => {
         setInternalStartDate(strAsDate(start_date));
