@@ -40,6 +40,7 @@ export default function RangeSlider(props: RangeSliderProps) {
         pushable,
         count,
         reverse,
+        allow_direct_input = true,
     } = props;
 
     // For range slider, we expect an array of values
@@ -263,6 +264,7 @@ export default function RangeSlider(props: RangeSliderProps) {
 
     // Determine if inputs should be rendered at all (CSS will handle responsive visibility)
     const shouldShowInputs =
+        allow_direct_input !== false && // Not disabled by allow_direct_input
         step !== null && // Not disabled by step=None
         value.length <= 2 && // Only for single or range sliders
         !vertical; // Only for horizontal sliders

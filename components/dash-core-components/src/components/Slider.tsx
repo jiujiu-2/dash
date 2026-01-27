@@ -23,6 +23,7 @@ export default function Slider({
     // eslint-disable-next-line no-magic-numbers
     verticalHeight = 400,
     step = undefined,
+    allow_direct_input = true,
     setProps,
     value,
     drag_value,
@@ -77,6 +78,7 @@ export default function Slider({
                 updatemode={updatemode}
                 verticalHeight={verticalHeight}
                 step={step}
+                allow_direct_input={allow_direct_input}
                 value={mappedValue}
                 drag_value={mappedDragValue}
                 setProps={mappedSetProps}

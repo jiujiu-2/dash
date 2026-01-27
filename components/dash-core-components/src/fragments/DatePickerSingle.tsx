@@ -13,6 +13,7 @@ import {
     isSameDay,
     strAsDate,
 } from '../utils/calendar/helpers';
+import {captureCSSForPortal} from '../utils/calendar/cssVariables';
 import '../components/css/datepickers.css';
 
 const DatePickerSingle = ({
@@ -64,6 +65,11 @@ const DatePickerSingle = ({
     const inputRef = useRef<HTMLInputElement | null>(null);
     const calendarRef = useRef<CalendarHandle>(null);
     const hasPortal = with_portal || with_full_screen_portal;
+
+    // Capture CSS variables for portal mode
+    const portalStyle = useMemo(() => {
+        return hasPortal ? captureCSSForPortal(containerRef) : undefined;
+    }, [hasPortal, isCalendarOpen]);
 
     useEffect(() => {
         setInternalDate(strAsDate(date));
@@ -201,7 +207,9 @@ const DatePickerSingle = ({
                     </div>
                 </Popover.Trigger>
 
-                <Popover.Portal container={containerRef.current}>
+                <Popover.Portal
+                    container={hasPortal ? undefined : containerRef.current}
+                >
                     <Popover.Content
                         className={`dash-datepicker-content${
                             hasPortal ? ' dash-datepicker-portal' : ''
@@ -210,6 +218,7 @@ const DatePickerSingle = ({
                                 ? ' dash-datepicker-fullscreen'
                                 : ''
                         }`}
+                        style={portalStyle}
                         align={hasPortal ? 'center' : 'start'}
                         sideOffset={hasPortal ? 0 : 5}
                         avoidCollisions={!hasPortal}

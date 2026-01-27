@@ -11,6 +11,9 @@
     position: relative;
     accent-color: var(--Dash-Fill-Interactive-Strong);
     outline-color: var(--Dash-Fill-Interactive-Strong);
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
 }
 
 .dash-datepicker-input-wrapper {
@@ -146,8 +149,7 @@
     overscroll-behavior: contain;
 }
 
-.dash-datepicker
-    [data-radix-popper-content-wrapper]:has(.dash-datepicker-portal) {
+[data-radix-popper-content-wrapper]:has(.dash-datepicker-portal) {
     transform: none !important;
 }
 

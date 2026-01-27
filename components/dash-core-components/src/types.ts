@@ -499,6 +499,12 @@ export interface SliderProps extends BaseDccProps<SliderProps> {
      * The height, in px, of the slider if it is vertical.
      */
     verticalHeight?: number;
+
+    /**
+     * If false, the input elements for directly entering values will be hidden.
+     * Only the slider will be visible and it will occupy 100% width of the container.
+     */
+    allow_direct_input?: boolean;
 }
 
 export interface RangeSliderProps extends BaseDccProps<RangeSliderProps> {
@@ -604,6 +610,12 @@ export interface RangeSliderProps extends BaseDccProps<RangeSliderProps> {
      * The height, in px, of the slider if it is vertical.
      */
     verticalHeight?: number;
+
+    /**
+     * If false, the input elements for directly entering values will be hidden.
+     * Only the slider will be visible and it will occupy 100% width of the container.
+     */
+    allow_direct_input?: boolean;
 }
 
 export type OptionValue = string | number | boolean;

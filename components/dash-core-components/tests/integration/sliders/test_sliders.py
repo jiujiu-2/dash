@@ -654,3 +654,83 @@ def test_slsl018_marks_limit_exceeded(dash_dcc):
     assert len(logs) > 0
     warning_found = any("Too many marks" in log["message"] for log in logs)
     assert warning_found, "Expected warning about too many marks not found in logs"
+
+
+def test_slsl019_allow_direct_input_false(dash_dcc):
+    """Test that allow_direct_input=False hides input elements for both Slider and RangeSlider"""
+    app = Dash(__name__)
+    app.layout = html.Div(
+        [
+            html.Div(
+                [
+                    html.Label("Slider with allow_direct_input=False"),
+                    dcc.Slider(
+                        id="slider-no-input",
+                        min=0,
+                        max=100,
+                        step=5,
+                        value=50,
+                        allow_direct_input=False,
+                    ),
+                    html.Div(id="slider-output"),
+                ]
+            ),
+            html.Div(
+                [
+                    html.Label("RangeSlider with allow_direct_input=False"),
+                    dcc.RangeSlider(
+                        id="rangeslider-no-input",
+                        min=0,
+                        max=100,
+                        step=5,
+                        value=[25, 75],
+                        allow_direct_input=False,
+                    ),
+                    html.Div(id="rangeslider-output"),
+                ]
+            ),
+        ]
+    )
+
+    @app.callback(
+        Output("slider-output", "children"), [Input("slider-no-input", "value")]
+    )
+    def update_slider(value):
+        return f"Slider: {value}"
+
+    @app.callback(
+        Output("rangeslider-output", "children"),
+        [Input("rangeslider-no-input", "value")],
+    )
+    def update_rangeslider(value):
+        return f"RangeSlider: {value[0]}-{value[1]}"
+
+    dash_dcc.start_server(app)
+    dash_dcc.wait_for_text_to_equal("#slider-output", "Slider: 50")
+    dash_dcc.wait_for_text_to_equal("#rangeslider-output", "RangeSlider: 25-75")
+
+    # Verify no input elements exist for slider with allow_direct_input=False
+    slider_inputs = dash_dcc.find_elements("#slider-no-input .dash-range-slider-input")
+    assert (
+        len(slider_inputs) == 0
+    ), "Expected 0 inputs for slider with allow_direct_input=False"
+
+    # Verify no input elements exist for rangeslider with allow_direct_input=False
+    rangeslider_inputs = dash_dcc.find_elements(
+        "#rangeslider-no-input .dash-range-slider-input"
+    )
+    assert (
+        len(rangeslider_inputs) == 0
+    ), "Expected 0 inputs for rangeslider with allow_direct_input=False"
+
+    # Verify sliders are still functional by clicking them
+    slider = dash_dcc.find_element("#slider-no-input")
+    dash_dcc.click_at_coord_fractions(slider, 0.75, 0.5)
+    dash_dcc.wait_for_text_to_equal("#slider-output", "Slider: 75")
+
+    rangeslider = dash_dcc.find_element("#rangeslider-no-input")
+    # Click closer to the left to move the lower handle
+    dash_dcc.click_at_coord_fractions(rangeslider, 0.1, 0.5)
+    dash_dcc.wait_for_text_to_equal("#rangeslider-output", "RangeSlider: 10-75")
+
+    assert dash_dcc.get_logs() == []

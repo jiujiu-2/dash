@@ -2,6 +2,12 @@
 All notable changes to `dash` will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## UNRELEASED
+
+## Added
+- Add a prop to sliders, `allow_direct_input`, that can be used to disable the inputs rendered with sliders.
+- Improve CSS styles in calendar when looking at selected dates outside the current calendar month (`show_outside_days=True`)
+
 ## [4.0.0rc6] - 2026-01-07
 
 ## Added
@@ -13,7 +19,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ## [4.0.0rc5] - 2025-12-16
 
 ## Added
-- New prop in `dcc.Upload` allows users to recursively upload entire folders at once
+- [#3464](https://github.com/plotly/dash/issues/3464) Add folder upload functionality to `dcc.Upload` component. When `multiple=True`, users can now select and upload entire folders in addition to individual files. The folder hierarchy is preserved in filenames (e.g., `folder/subfolder/file.txt`). Files within folders are filtered according to the `accept` prop. Folder support is available in Chrome, Edge, and Opera; other browsers gracefully fall back to file-only mode. The uploaded files use the same output API as multiple file uploads.
 
 ## Changed
 - Bugfixes for feedback received in `rc4`
@@ -84,7 +90,6 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ## [3.3.0] - 2025-11-12
 
 ## Added
-- [#3464](https://github.com/plotly/dash/issues/3464) Add folder upload functionality to `dcc.Upload` component. When `multiple=True`, users can now select and upload entire folders in addition to individual files. The folder hierarchy is preserved in filenames (e.g., `folder/subfolder/file.txt`). Files within folders are filtered according to the `accept` prop. Folder support is available in Chrome, Edge, and Opera; other browsers gracefully fall back to file-only mode. The uploaded files use the same output API as multiple file uploads.
 - [#3395](https://github.com/plotly/dash/pull/3396) Add position argument to hooks.devtool
 - [#3403](https://github.com/plotly/dash/pull/3403) Add app_context to get_app, allowing to get the current app in routes.
 - [#3407](https://github.com/plotly/dash/pull/3407) Add `hidden` to callback arguments, hiding the callback from appearing in the devtool callback graph.

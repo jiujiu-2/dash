@@ -19,6 +19,7 @@ export default function RangeSlider({
     // eslint-disable-next-line no-magic-numbers
     verticalHeight = 400,
     step = undefined,
+    allow_direct_input = true,
     ...props
 }: RangeSliderProps) {
     // Some considerations for the default value of `step`:
@@ -38,6 +39,7 @@ export default function RangeSlider({
                 updatemode={updatemode}
                 verticalHeight={verticalHeight}
                 step={step}
+                allow_direct_input={allow_direct_input}
                 {...props}
             />
         </Suspense>
