@@ -11,7 +11,6 @@
 .dash-options-list-option:not(:has(input[disabled])):hover,
 .dash-options-list-option:not(:has(input[disabled])):focus-within {
     color: var(--Dash-Fill-Interactive-Strong);
-    background: var(--Dash-Fill-Interactive-Weak);
 }
 
 .dash-options-list-option:has(input[disabled]) {
