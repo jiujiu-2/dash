@@ -2,7 +2,7 @@
 All notable changes to `dash` will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## [4.0.0] - UNRELEASED
+## [4.0.0] - 2026-02-03
 
 ## Added
 - Finalize all redesigned dash core components
