@@ -15,12 +15,14 @@ NumberType = typing.Union[
 ]
 
 
-class Textarea(Component):
-    """A Textarea component.
-    A basic HTML textarea for entering multiline text.
-    *
+class Button(Component):
+    """A Button component.
+    Similar to dash.html.Button, but with theming and styles applied.
 
     Keyword arguments:
+
+    - children (a list of or a singular dash component, string or number; optional):
+        The children of this component.
 
     - id (string; optional):
         The ID of this component, used to identify dash components in
@@ -28,26 +30,18 @@ class Textarea(Component):
         in an app.
 
     - accessKey (string; optional):
-        Defines a keyboard shortcut to activate or add focus to the
-        element.
+        Keyboard shortcut to activate or add focus to the element.
 
-    - autoFocus (string; optional):
+    - autoFocus (boolean; optional):
         The element should be automatically focused after the page loaded.
 
     - className (string; optional):
         Additional CSS class for the root DOM node.
 
-    - cols (number; optional):
-        Defines the number of columns in a textarea.
-
     - componentPath (boolean | number | string | dict | list; optional)
 
     - contentEditable (boolean; optional):
         Indicates whether the element's content is editable.
-
-    - contextMenu (string; optional):
-        Defines the ID of a <menu> element which will serve as the
-        element's context menu.
 
     - dir (string; optional):
         Defines the text direction. Allowed values are ltr (Left-To-Right)
@@ -62,30 +56,54 @@ class Textarea(Component):
     - form (string; optional):
         Indicates the form that is the owner of the element.
 
-    - hidden (string; optional):
+    - formAction (string; optional):
+        Indicates the action of the element, overriding the action defined
+        in the <form>.
+
+    - formEncType (string; optional):
+        If the button/input is a submit button (type=\"submit\"), this
+        attribute sets the encoding type to use during form submission. If
+        this attribute is specified, it overrides the enctype attribute of
+        the button's form owner.
+
+    - formMethod (string; optional):
+        If the button/input is a submit button (type=\"submit\"), this
+        attribute sets the submission method to use during form submission
+        (GET, POST, etc.). If this attribute is specified, it overrides
+        the method attribute of the button's form owner.
+
+    - formNoValidate (boolean; optional):
+        If the button/input is a submit button (type=\"submit\"), this
+        boolean attribute specifies that the form is not to be validated
+        when it is submitted. If this attribute is specified, it overrides
+        the novalidate attribute of the button's form owner.
+
+    - formTarget (string; optional):
+        If the button/input is a submit button (type=\"submit\"), this
+        attribute specifies the browsing context (for example, tab,
+        window, or inline frame) in which to display the response that is
+        received after submitting the form. If this attribute is
+        specified, it overrides the target attribute of the button's form
+        owner.
+
+    - hidden (boolean; optional):
         Prevents rendering of given element, while keeping child elements,
         e.g. script elements, active.
 
     - lang (string; optional):
         Defines the language used in the element.
 
-    - maxLength (number; optional):
-        Defines the maximum number of characters allowed in the element.
-
-    - minLength (number; optional):
-        Defines the minimum number of characters allowed in the element.
-
     - n_blur (number; default 0):
-        Number of times the textarea lost focus.
+        Number of times the button lost focus.
 
     - n_blur_timestamp (number; default -1):
-        Last time the textarea lost focus.
+        Last time the button lost focus.
 
     - n_clicks (number; default 0):
-        Number of times the textarea has been clicked.
+        Number of times the button has been clicked.
 
     - n_clicks_timestamp (number; default -1):
-        Last time the textarea was clicked.
+        Last time the button was clicked.
 
     - name (string; optional):
         Name of the element. For example used by the server to identify
@@ -110,23 +128,8 @@ class Textarea(Component):
         kept after the browser quit. session: window.sessionStorage, data
         is cleared once the browser quit.
 
-    - placeholder (string; optional):
-        Provides a hint to the user of what can be entered in the field.
-
-    - readOnly (boolean; optional):
-        Indicates whether the element can be edited. readOnly is an HTML
-        boolean attribute - it is enabled by a boolean or 'readOnly'.
-        Alternative capitalizations `readonly` & `READONLY` are also
-        acccepted.
-
-    - required (boolean; optional):
-        Indicates whether this element is required to fill out or not.
-        required is an HTML boolean attribute - it is enabled by a boolean
-        or 'required'. Alternative capitalizations `REQUIRED` are also
-        acccepted.
-
-    - rows (number; optional):
-        Defines the number of rows in a text area.
+    - role (string; optional):
+        Defines the role of an element in the context of accessibility.
 
     - spellCheck (boolean; optional):
         Indicates whether spell checking is allowed for the element.
@@ -138,55 +141,21 @@ class Textarea(Component):
     - title (string; optional):
         Text to be displayed in a tooltip when hovering over the element.
 
-    - value (string; optional):
-        The value of the textarea.
+    - type (a value equal to: None, 'submit', 'reset', 'button'; default 'button'):
+        Defines the type of the element.
 
-    - wrap (string; optional):
-        Indicates whether the text should be wrapped."""
+    - value (string | number | list of strings; optional):
+        Defines a default value which will be displayed in the element on
+        page load."""
 
     _children_props: typing.List[str] = []
     _base_nodes = ["children"]
     _namespace = "dash_core_components"
-    _type = "Textarea"
+    _type = "Button"
 
     def __init__(
         self,
-        value: typing.Optional[typing.Union[str]] = None,
-        autoFocus: typing.Optional[typing.Union[str]] = None,
-        cols: typing.Optional[typing.Union[NumberType]] = None,
-        disabled: typing.Optional[
-            typing.Union[bool, Literal["disabled"], Literal["DISABLED"]]
-        ] = None,
-        form: typing.Optional[typing.Union[str]] = None,
-        maxLength: typing.Optional[typing.Union[NumberType]] = None,
-        minLength: typing.Optional[typing.Union[NumberType]] = None,
-        name: typing.Optional[typing.Union[str]] = None,
-        placeholder: typing.Optional[typing.Union[str]] = None,
-        readOnly: typing.Optional[
-            typing.Union[
-                bool, Literal["readOnly"], Literal["readonly"], Literal["READONLY"]
-            ]
-        ] = None,
-        required: typing.Optional[
-            typing.Union[bool, Literal["required"], Literal["REQUIRED"]]
-        ] = None,
-        rows: typing.Optional[typing.Union[NumberType]] = None,
-        wrap: typing.Optional[typing.Union[str]] = None,
-        accessKey: typing.Optional[typing.Union[str]] = None,
-        contentEditable: typing.Optional[typing.Union[bool]] = None,
-        contextMenu: typing.Optional[typing.Union[str]] = None,
-        dir: typing.Optional[typing.Union[str]] = None,
-        draggable: typing.Optional[typing.Union[bool]] = None,
-        hidden: typing.Optional[typing.Union[str]] = None,
-        lang: typing.Optional[typing.Union[str]] = None,
-        spellCheck: typing.Optional[typing.Union[bool]] = None,
-        style: typing.Optional[typing.Any] = None,
-        tabIndex: typing.Optional[typing.Union[NumberType]] = None,
-        title: typing.Optional[typing.Union[str]] = None,
-        n_blur: typing.Optional[typing.Union[NumberType]] = None,
-        n_blur_timestamp: typing.Optional[typing.Union[NumberType]] = None,
-        n_clicks: typing.Optional[typing.Union[NumberType]] = None,
-        n_clicks_timestamp: typing.Optional[typing.Union[NumberType]] = None,
+        children: typing.Optional[ComponentType] = None,
         className: typing.Optional[typing.Union[str]] = None,
         persistence: typing.Optional[typing.Union[str, NumberType, bool]] = None,
         persisted_props: typing.Optional[typing.Any] = None,
@@ -195,25 +164,57 @@ class Textarea(Component):
         ] = None,
         id: typing.Optional[typing.Union[str, dict]] = None,
         componentPath: typing.Optional[typing.Any] = None,
+        type: typing.Optional[Literal[None, "submit", "reset", "button"]] = None,
+        autoFocus: typing.Optional[typing.Union[bool]] = None,
+        disabled: typing.Optional[typing.Union[bool]] = None,
+        form: typing.Optional[typing.Union[str]] = None,
+        formAction: typing.Optional[typing.Union[str]] = None,
+        formEncType: typing.Optional[typing.Union[str]] = None,
+        formMethod: typing.Optional[typing.Union[str]] = None,
+        formNoValidate: typing.Optional[typing.Union[bool]] = None,
+        formTarget: typing.Optional[typing.Union[str]] = None,
+        name: typing.Optional[typing.Union[str]] = None,
+        value: typing.Optional[
+            typing.Union[str, NumberType, typing.Sequence[str]]
+        ] = None,
+        accessKey: typing.Optional[typing.Union[str]] = None,
+        contentEditable: typing.Optional[
+            typing.Union[bool, Literal["true"], Literal["false"], Literal["inherit"]]
+        ] = None,
+        dir: typing.Optional[typing.Union[str]] = None,
+        draggable: typing.Optional[typing.Union[bool]] = None,
+        hidden: typing.Optional[typing.Union[bool]] = None,
+        lang: typing.Optional[typing.Union[str]] = None,
+        role: typing.Optional[typing.Union[str]] = None,
+        spellCheck: typing.Optional[typing.Union[bool]] = None,
+        style: typing.Optional[typing.Any] = None,
+        tabIndex: typing.Optional[typing.Union[NumberType]] = None,
+        title: typing.Optional[typing.Union[str]] = None,
+        n_blur: typing.Optional[typing.Union[NumberType]] = None,
+        n_blur_timestamp: typing.Optional[typing.Union[NumberType]] = None,
+        n_clicks: typing.Optional[typing.Union[NumberType]] = None,
+        n_clicks_timestamp: typing.Optional[typing.Union[NumberType]] = None,
         **kwargs
     ):
         self._prop_names = [
+            "children",
             "id",
             "accessKey",
             "autoFocus",
             "className",
-            "cols",
             "componentPath",
             "contentEditable",
-            "contextMenu",
             "dir",
             "disabled",
             "draggable",
             "form",
+            "formAction",
+            "formEncType",
+            "formMethod",
+            "formNoValidate",
+            "formTarget",
             "hidden",
             "lang",
-            "maxLength",
-            "minLength",
             "n_blur",
             "n_blur_timestamp",
             "n_clicks",
@@ -222,35 +223,34 @@ class Textarea(Component):
             "persisted_props",
             "persistence",
             "persistence_type",
-            "placeholder",
-            "readOnly",
-            "required",
-            "rows",
+            "role",
             "spellCheck",
             "style",
             "tabIndex",
             "title",
+            "type",
             "value",
-            "wrap",
         ]
         self._valid_wildcard_attributes = []
         self.available_properties = [
+            "children",
             "id",
             "accessKey",
             "autoFocus",
             "className",
-            "cols",
             "componentPath",
             "contentEditable",
-            "contextMenu",
             "dir",
             "disabled",
             "draggable",
             "form",
+            "formAction",
+            "formEncType",
+            "formMethod",
+            "formNoValidate",
+            "formTarget",
             "hidden",
             "lang",
-            "maxLength",
-            "minLength",
             "n_blur",
             "n_blur_timestamp",
             "n_clicks",
@@ -259,24 +259,21 @@ class Textarea(Component):
             "persisted_props",
             "persistence",
             "persistence_type",
-            "placeholder",
-            "readOnly",
-            "required",
-            "rows",
+            "role",
             "spellCheck",
             "style",
             "tabIndex",
             "title",
+            "type",
             "value",
-            "wrap",
         ]
         self.available_wildcard_properties = []
         _explicit_args = kwargs.pop("_explicit_args")
         _locals = locals()
         _locals.update(kwargs)  # For wildcard attrs and excess named props
-        args = {k: _locals[k] for k in _explicit_args}
+        args = {k: _locals[k] for k in _explicit_args if k != "children"}
 
-        super(Textarea, self).__init__(**args)
+        super(Button, self).__init__(children=children, **args)
 
 
-setattr(Textarea, "__init__", _explicitize_args(Textarea.__init__))
+setattr(Button, "__init__", _explicitize_args(Button.__init__))
