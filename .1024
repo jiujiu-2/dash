@@ -1,0 +1,9 @@
+# Command to run when "Run" button clicked
+# Dash is a framework for building ML & data science web apps
+# Users need to create their own Dash app (e.g., tests/assets/simple_app.py)
+# This command verifies Dash installation and provides getting started guidance
+run_command: python3 -m http.server
+# Command to install or update dependencies, will execute each time a new thread created to ensure dependencies up-to-date
+dependency_command: "pip3 install -e . --user && npm ci"
+# Build command: Build all components (dash-renderer and components)
+compile_command: "npm run build.sequential"
